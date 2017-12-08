@@ -24,7 +24,7 @@ defmodule ConnectFour.GameServerTest do
 
   describe "drop_piece/1" do
     test "valid play records move" do
-      assert :ok = GenServer.drop_piece(1)
+      assert :ok = GameServer.drop_piece(1)
       state = GameServer.get_state()
 
       refute MapSet.member?(state.board.free, {1,1})
@@ -35,11 +35,11 @@ defmodule ConnectFour.GameServerTest do
       state = GameServer.get_state()
       assert state.current_player == 1
 
-      GenServer.drop_piece(1)
+      GameServer.drop_piece(1)
       state = GameServer.get_state()
       assert state.current_player == 2
 
-      GenServer.drop_piece(1)
+      GameServer.drop_piece(1)
       state = GameServer.get_state()
       assert state.current_player == 1
     end
