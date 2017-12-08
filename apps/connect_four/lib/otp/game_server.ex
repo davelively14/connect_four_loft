@@ -5,8 +5,8 @@ defmodule ConnectFour.GameServer do
   # API #
   #######
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link(%{height: height, width: width} \\ %{height: 7, width: 6}) do
+    GenServer.start_link(__MODULE__, [height, width], name: __MODULE__)
   end
 
   def get_state do
@@ -17,8 +17,8 @@ defmodule ConnectFour.GameServer do
   # Callbacks #
   #############
 
-  def init(_) do
-    {:ok, default_state()}
+  def init([height, width]) do
+    {:ok, default_state(height, width)}
   end
 
   def handle_call(:get_state, _from, state) do
@@ -29,10 +29,10 @@ defmodule ConnectFour.GameServer do
   # Support Functions #
   #####################
 
-  defp default_state do
+  defp default_state(height, width) do
     %{
       board: %{
-        free: setup_board(7, 6),
+        free: setup_board(height, width),
         player_1: MapSet.new(),
         player_2: MapSet.new()
       },
