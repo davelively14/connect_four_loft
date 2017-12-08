@@ -36,6 +36,8 @@ defmodule ConnectFour.GameServer do
         player_1: MapSet.new(),
         player_2: MapSet.new()
       },
+      height: height,
+      width: width,
       current_player: 1,
       finished: nil
     }
