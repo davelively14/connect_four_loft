@@ -15,7 +15,7 @@ defmodule ConnectFour.GameServerTest do
       assert 0 == MapSet.size state.board.player_1
       assert 0 == MapSet.size state.board.player_2
 
-      assert is_integer state.current_player
+      assert is_atom state.current_player
       assert is_integer state.height
       assert is_integer state.width
       assert !state.finished
@@ -23,25 +23,25 @@ defmodule ConnectFour.GameServerTest do
   end
 
   describe "drop_piece/1" do
+    @tag :this
     test "valid play records move" do
       assert :ok = GameServer.drop_piece(1)
       state = GameServer.get_state()
-
       refute MapSet.member?(state.board.free, {1,1})
       assert MapSet.member?(state.board.player_1, {1,1})
     end
 
     test "valid move alternates player" do
       state = GameServer.get_state()
-      assert state.current_player == 1
+      assert state.current_player == :player_1
 
       GameServer.drop_piece(1)
       state = GameServer.get_state()
-      assert state.current_player == 2
+      assert state.current_player == :player_2
 
       GameServer.drop_piece(1)
       state = GameServer.get_state()
-      assert state.current_player == 1
+      assert state.current_player == :player_1
     end
 
     test "invalid play not allowed" do
