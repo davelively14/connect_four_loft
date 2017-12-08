@@ -43,7 +43,7 @@ defmodule ConnectFour.GameServerTest do
       assert state.current_player == :player_1
     end
 
-    test "invalid play not allowed" do
+    test "invalid play returns error" do
       for _ <- 1..6, do: GameServer.drop_piece(1)
       initial_state = GameServer.get_state()
       assert {:error, "Row is full"} == GameServer.drop_piece(1)
@@ -51,5 +51,47 @@ defmodule ConnectFour.GameServerTest do
       end_state = GameServer.get_state()
       assert initial_state.current_player == end_state.current_player
     end
+
+    test "returns winner when game is won" do
+      assert {:ok, "player_1 wins!"} == win_game()
+    end
+
+    test "further attempts to play will result in error when game is already won" do
+      win_game()
+      assert {:error, "player_1 already won the game."} == GameServer.drop_piece(2)
+    end
+
+    test "reports when draw occurs" do
+      assert {:ok, "The game ended in a draw."} == fill_board()
+    end
+
+    test "further attempts to play will result in error when game is already in draw" do
+      fill_board()
+      assert {:error, "The game ended in a draw."} == GameServer.drop_piece(1)
+    end
+  end
+
+  #####################
+  # Private Functions #
+  #####################
+
+  defp fill_board do
+    for _ <- 1..6 do
+      for x <- 1..7 do
+        GameServer.drop_piece(x)
+      end
+    end
+    |> List.flatten()
+    |> List.last()
+  end
+
+  defp win_game do
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(1)
   end
 end

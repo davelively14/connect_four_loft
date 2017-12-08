@@ -29,7 +29,7 @@ defmodule ConnectFour.GameServer do
     {:reply, state, state}
   end
 
-  def handle_call({:drop_piece, col}, _from, state) do
+  def handle_call({:drop_piece, col}, _from, state = %{finished: nil}) do
     if open_spot = find_open(state.board.free, state.height, col) do
       new_state =
         make_move(open_spot, state)
@@ -47,7 +47,7 @@ defmodule ConnectFour.GameServer do
   defp reset_state(height, width) do
     %{
       board: %{
-        free: setup_board(height, width),
+        free: setup_board(width, height),
         player_1: MapSet.new(),
         player_2: MapSet.new()
       },
@@ -82,6 +82,7 @@ defmodule ConnectFour.GameServer do
     new_board =
       Map.merge(state.board, Map.new([{state.current_player, new_player_boar}]))
       |> Map.merge(%{free: new_free})
+
     Map.merge(state, %{board: new_board})
   end
 
