@@ -18,7 +18,7 @@ defmodule ConnectFour.GameServer do
   #############
 
   def init([height, width]) do
-    {:ok, default_state(height, width)}
+    {:ok, reset_state(height, width)}
   end
 
   def handle_call(:get_state, _from, state) do
@@ -29,7 +29,7 @@ defmodule ConnectFour.GameServer do
   # Support Functions #
   #####################
 
-  defp default_state(height, width) do
+  defp reset_state(height, width) do
     %{
       board: %{
         free: setup_board(height, width),
