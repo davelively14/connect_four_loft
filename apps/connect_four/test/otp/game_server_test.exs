@@ -23,7 +23,6 @@ defmodule ConnectFour.GameServerTest do
   end
 
   describe "drop_piece/1" do
-    @tag :this
     test "valid play records move" do
       assert :ok = GameServer.drop_piece(1)
       state = GameServer.get_state()
