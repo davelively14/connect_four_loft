@@ -5,7 +5,7 @@ defmodule ConnectFour.GameServer do
   # API #
   #######
 
-  def start_link(%{height: height, width: width} \\ %{height: 7, width: 6}) do
+  def start_link(%{height: height, width: width}) do
     GenServer.start_link(__MODULE__, [height, width], name: __MODULE__)
   end
 
