@@ -1,18 +1,18 @@
 defmodule ConnectFour do
-  @moduledoc """
-  Documentation for ConnectFour.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    import Supervisor.Spec
 
-  ## Examples
+    children = [
+      worker(ConnectFour.GameServer, [%{height: 6, width: 7}], [])
+    ]
 
-      iex> ConnectFour.hello
-      :world
+    opts = [
+      strategy: :one_for_one,
+      name: ConnectFour.Supervisor
+    ]
 
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, opts)
   end
 end
