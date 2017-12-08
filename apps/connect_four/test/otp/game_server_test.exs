@@ -21,4 +21,36 @@ defmodule ConnectFour.GameServerTest do
       assert !state.finished
     end
   end
+
+  describe "drop_piece/1" do
+    test "valid play records move" do
+      assert :ok = GenServer.drop_piece(1)
+      state = GameServer.get_state()
+
+      refute MapSet.member?(state.board.free, {1,1})
+      assert MapSet.member?(state.board.player_1, {1,1})
+    end
+
+    test "valid move alternates player" do
+      state = GameServer.get_state()
+      assert state.current_player == 1
+
+      GenServer.drop_piece(1)
+      state = GameServer.get_state()
+      assert state.current_player == 2
+
+      GenServer.drop_piece(1)
+      state = GameServer.get_state()
+      assert state.current_player == 1
+    end
+
+    test "invalid play not allowed" do
+      for _ <- 1..6, do: GameServer.drop_piece(1)
+      initial_state = GameServer.get_state()
+      assert {:error, "Row is full"} == GameServer.drop_piece(1)
+
+      end_state = GameServer.get_state()
+      assert initial_state.current_player == end_state.current_player
+    end
+  end
 end
