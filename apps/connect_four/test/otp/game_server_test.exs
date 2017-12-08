@@ -11,6 +11,8 @@ defmodule ConnectFour.GameServerTest do
       assert MapSet.size state.board.player_2
 
       assert is_integer state.current_player
+      assert is_integer state.height
+      assert is_integer state.width
       assert !state.finished
     end
   end
