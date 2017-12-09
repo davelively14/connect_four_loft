@@ -71,6 +71,18 @@ defmodule ConnectFour.GameServerTest do
     end
   end
 
+  describe "check_lateral/2" do
+    test "returns true if win laterally" do
+      loc = {3,1}
+      assert GameServer.check_lateral(win_lateral_board(loc), loc)
+    end
+
+    test "returns false if no win laterally" do
+      loc = {3,1}
+      refute GameServer.check_lateral(no_win_lateral_board(loc), loc)
+    end
+  end
+
   #####################
   # Private Functions #
   #####################
@@ -93,5 +105,20 @@ defmodule ConnectFour.GameServerTest do
     GameServer.drop_piece(1)
     GameServer.drop_piece(2)
     GameServer.drop_piece(1)
+  end
+
+  defp win_lateral_board({x, y}) do
+    MapSet.new()
+    |> MapSet.put({x, y})
+    |> MapSet.put({x + 1, y})
+    |> MapSet.put({x + 2, y})
+    |> MapSet.put({x - 1, y})
+  end
+
+  defp no_win_lateral_board({x, y}) do
+    MapSet.new()
+    |> MapSet.put({x, y})
+    |> MapSet.put({x + 1, y})
+    |> MapSet.put({x + 2, y})
   end
 end
