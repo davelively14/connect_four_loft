@@ -52,23 +52,24 @@ defmodule ConnectFour.GameServerTest do
       assert initial_state.current_player == end_state.current_player
     end
 
-    # test "returns winner when game is won" do
-    #   assert {:ok, "player_1 wins!"} == win_game_lateral()
-    # end
-    #
-    # test "further attempts to play will result in error when game is already won" do
-    #   win_game_lateral()
-    #   assert {:error, "player_1 already won the game."} == GameServer.drop_piece(2)
-    # end
-    #
-    # test "reports when draw occurs" do
-    #   assert {:ok, "The game ended in a draw."} == fill_board()
-    # end
-    #
-    # test "further attempts to play will result in error when game is already in draw" do
-    #   fill_board()
-    #   assert {:error, "The game ended in a draw."} == GameServer.drop_piece(1)
-    # end
+    test "returns winner when game is won" do
+      assert {:ok, :player_1} == win_game_lateral()
+    end
+
+    test "further attempts to play will result in error when game is already won" do
+      win_game_lateral()
+      assert {:error, "player_1 already won the game."} == GameServer.drop_piece(2)
+    end
+
+    @tag :this
+    test "reports when draw occurs" do
+      assert {:ok, :draw} == fill_board()
+    end
+
+    test "further attempts to play will result in error when game is already in draw" do
+      fill_board()
+      assert {:error, "The game ended in a draw."} == GameServer.drop_piece(1)
+    end
   end
 
   describe "check_lateral/2" do
@@ -124,10 +125,18 @@ defmodule ConnectFour.GameServerTest do
   #####################
 
   defp fill_board do
-    for _ <- 1..6 do
-      for x <- 1..7 do
-        GameServer.drop_piece(x)
+    for outer <- 0..1 do
+      for x <- 1..3 do
+        for _ <- 0..4 do
+          GameServer.drop_piece(x + outer * 3)
+        end
       end
+      for x <- 1..3 do
+        GameServer.drop_piece(x + outer * 3)
+      end
+    end
+    for _ <- 1..6 do
+      GameServer.drop_piece(7)
     end
     |> List.flatten()
     |> List.last()
