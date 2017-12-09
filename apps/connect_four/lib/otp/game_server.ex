@@ -17,6 +17,10 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, {:drop_piece, col})
   end
 
+  def reset_game do
+    GenServer.call(__MODULE__, :reset_game)
+  end
+
   #############
   # Callbacks #
   #############
@@ -49,6 +53,11 @@ defmodule ConnectFour.GameServer do
       finished == :draw -> {:reply, {:error, "The game ended in a draw."}, state}
       true -> {:reply, {:error, "#{state.finished} already won the game."}, state}
     end
+  end
+
+  def handle_call(:reset_game, _from, state) do
+    new_state = reset_state(state.height, state.width)
+    {:reply, :ok, new_state}
   end
 
   #####################
