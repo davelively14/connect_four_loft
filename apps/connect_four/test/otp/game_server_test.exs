@@ -4,7 +4,8 @@ defmodule ConnectFour.GameServerTest do
 
   setup do
     ConnectFour.start(nil, %{height: 6, width: 7})
-    :ok
+    initial_state = GameServer.get_state
+    {:ok, %{initial_state: initial_state}}
   end
 
   describe "get_state/0" do
@@ -19,6 +20,7 @@ defmodule ConnectFour.GameServerTest do
       assert is_integer state.height
       assert is_integer state.width
       assert !state.finished
+      assert is_map state.dimensions
     end
   end
 
@@ -131,6 +133,44 @@ defmodule ConnectFour.GameServerTest do
     end
   end
 
+  describe "reset_game/0" do
+    test "resets a game to original parameters with game in progress", %{initial_state: initial_state} do
+      middle_of_game()
+      current_state = GameServer.get_state()
+      refute current_state.finished
+      refute initial_state == current_state
+
+      assert :ok == GameServer.reset_game()
+
+      reset_state = GameServer.get_state()
+      assert reset_state == initial_state
+    end
+
+    test "resets a game to original parameters when game is won", %{initial_state: initial_state} do
+      win_game_vertical()
+      current_state = GameServer.get_state()
+      assert current_state.finished == :player_1
+      refute initial_state == current_state
+
+      assert :ok == GameServer.reset_game()
+
+      reset_state = GameServer.get_state()
+      assert reset_state == initial_state
+    end
+
+    test "resets a game to original parameters when game is a draw", %{initial_state: initial_state} do
+      fill_board()
+      current_state = GameServer.get_state()
+      assert current_state.finished == :draw
+      refute initial_state == current_state
+
+      assert :ok == GameServer.reset_game()
+
+      reset_state = GameServer.get_state()
+      assert reset_state == initial_state
+    end
+  end
+
   #####################
   # Private Functions #
   #####################
@@ -199,6 +239,19 @@ defmodule ConnectFour.GameServerTest do
     GameServer.drop_piece(4)
     GameServer.drop_piece(4)
     GameServer.drop_piece(1)
+  end
+
+  defp middle_of_game do
+    for outer <- 0..1 do
+      for x <- 1..3 do
+        for _ <- 0..4 do
+          GameServer.drop_piece(x + outer * 3)
+        end
+      end
+      for x <- 1..3 do
+        GameServer.drop_piece(x + outer * 3)
+      end
+    end
   end
 
   defp win_lateral_board({x, y}) do
