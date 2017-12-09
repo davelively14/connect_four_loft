@@ -46,7 +46,7 @@ defmodule ConnectFour.GameServerTest do
     test "invalid play returns error" do
       for _ <- 1..6, do: GameServer.drop_piece(1)
       initial_state = GameServer.get_state()
-      assert {:error, "Row is full"} == GameServer.drop_piece(1)
+      assert {:error, "Column 1 is full. Chose another column."} == GameServer.drop_piece(1)
 
       end_state = GameServer.get_state()
       assert initial_state.current_player == end_state.current_player

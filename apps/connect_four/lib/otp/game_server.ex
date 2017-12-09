@@ -34,8 +34,11 @@ defmodule ConnectFour.GameServer do
       new_state =
         make_move(open_spot, state)
         |> Map.merge(%{current_player: advance_player(state.current_player)})
-      # TODO Reply back :ok for good move, or a result if draw/won
-      {:reply, :ok, new_state}
+      if !new_state.finished do
+        {:reply, :ok, new_state}
+      else
+        {:reply, {:ok, new_state.finished}, new_state}
+      end
     else
       {:reply, {:error, "Row is full"}, state}
     end
@@ -44,7 +47,7 @@ defmodule ConnectFour.GameServer do
   def handle_call({:drop_piece, _col}, _from, state = %{finished: finished}) do
     cond do
       finished == :draw -> {:reply, {:error, "The game ended in a draw."}, state}
-      true -> {:reply, {:error, "#{state.finished} already won the game."}}
+      true -> {:reply, {:error, "#{state.finished} already won the game."}, state}
     end
   end
 
@@ -90,7 +93,14 @@ defmodule ConnectFour.GameServer do
     new_board =
       Map.merge(state.board, Map.new([{state.current_player, new_player_board}]))
       |> Map.merge(%{free: new_free})
-    Map.merge(state, %{board: new_board, finished: check_win(state.current_player, new_player_board, loc)})
+
+    Map.merge(
+      state,
+      %{
+        board: new_board,
+        finished: check_win_or_draw(state.current_player, new_free, new_player_board, loc)
+      }
+    )
   end
 
   defp advance_player(:player_1), do: :player_2
@@ -100,13 +110,13 @@ defmodule ConnectFour.GameServer do
   # Check Status #
   ################
 
-  defp check_win(player, player_board, loc) do
+  defp check_win_or_draw(player, free, player_board, loc) do
     cond do
       check_lateral(player_board, loc) -> player
       check_vertical(player_board, loc) -> player
       check_diag_back(player_board, loc) -> player
       check_diag_fwd(player_board, loc) -> player
-      # TODO add check draw
+      MapSet.size(free) == 0 -> :draw
       true -> nil
     end
   end
