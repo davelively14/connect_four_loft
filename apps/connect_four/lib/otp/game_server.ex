@@ -65,7 +65,8 @@ defmodule ConnectFour.GameServer do
       height: height,
       width: width,
       current_player: :player_1,
-      finished: nil
+      finished: nil,
+      dimensions: %{height: height, width: width}
     }
   end
 
