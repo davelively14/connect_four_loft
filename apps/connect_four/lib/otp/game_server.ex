@@ -40,7 +40,7 @@ defmodule ConnectFour.GameServer do
         {:reply, {:ok, new_state.finished}, new_state}
       end
     else
-      {:reply, {:error, "Row is full"}, state}
+      {:reply, {:error, "Column #{col} is full. Chose another column."}, state}
     end
   end
 
