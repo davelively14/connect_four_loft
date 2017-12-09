@@ -112,9 +112,15 @@ defmodule ConnectFour.GameServer do
     check_left(1, player_board, {x - 1, y}) |> check_right(player_board, {x + 1, y}) == 4
   end
 
-  # def check_vertical(player_board, {x, y}) do
-  #   check_up(0, player_board, loc)
-  # end
+  def check_vertical(player_board, {x, y}), do: check_vertical(1, player_board, {x, y - 1})
+  def check_vertical(4, _, _), do: true
+  def check_vertical(streak, player_board, loc = {x, y}) do
+    if MapSet.member?(player_board, loc) do
+      check_vertical(streak + 1, player_board, {x, y - 1})
+    else
+      false
+    end
+  end
 
   defp check_left(4, _, _), do: 4
   defp check_left(streak, player_board, loc = {x, y}) do
