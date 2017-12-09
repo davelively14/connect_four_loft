@@ -105,6 +105,8 @@ defmodule ConnectFour.GameServer do
       check_lateral(player_board, loc) -> player
       check_vertical(player_board, loc) -> player
       check_diag_back(player_board, loc) -> player
+      check_diag_fwd(player_board, loc) -> player
+      # TODO add check draw
       true -> nil
     end
   end
@@ -125,6 +127,10 @@ defmodule ConnectFour.GameServer do
 
   def check_diag_back(player_board, {x, y}) do
     check_up_left(1, player_board, {x - 1, y + 1}) |> check_down_right(player_board, {x + 1, y - 1}) == 4
+  end
+
+  def check_diag_fwd(player_board, {x, y}) do
+    check_up_right(1, player_board, {x + 1, y + 1}) |> check_down_left(player_board, {x - 1, y - 1}) == 4
   end
 
   defp check_left(4, _, _), do: 4
@@ -158,6 +164,24 @@ defmodule ConnectFour.GameServer do
   defp check_down_right(streak, player_board, loc = {x, y}) do
     if MapSet.member?(player_board, loc) do
       check_down_right(streak + 1, player_board, {x + 1, y - 1})
+    else
+      streak
+    end
+  end
+
+  defp check_up_right(4, _, _), do: 4
+  defp check_up_right(streak, player_board, loc = {x, y}) do
+    if MapSet.member?(player_board, loc) do
+      check_up_right(streak + 1, player_board, {x + 1, y + 1})
+    else
+      streak
+    end
+  end
+
+  defp check_down_left(4, _, _), do: 4
+  defp check_down_left(streak, player_board, loc = {x, y}) do
+    if MapSet.member?(player_board, loc) do
+      check_down_left(streak + 1, player_board, {x - 1, y - 1})
     else
       streak
     end
