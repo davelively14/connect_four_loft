@@ -96,14 +96,26 @@ defmodule ConnectFour.GameServerTest do
   end
 
   describe "check_diag_back/2" do
-    test "returns true if win vertically" do
+    test "returns true if win backslash diagonally" do
       loc = {3,3}
       assert GameServer.check_diag_back(win_diag_back_board(loc), loc)
     end
 
-    test "returns false if no win vertically" do
+    test "returns false if no win backslash diagonally" do
       loc = {3,3}
       refute GameServer.check_diag_back(no_win_diag_back_board(loc), loc)
+    end
+  end
+
+  describe "check_diag_fwd/2" do
+    test "returns true if win forwardslash diagonally" do
+      loc = {3,3}
+      assert GameServer.check_diag_fwd(win_diag_fwd_board(loc), loc)
+    end
+
+    test "returns false if no win forwardslash diagonally" do
+      loc = {3,3}
+      refute GameServer.check_diag_fwd(no_win_diag_fwd_board(loc), loc)
     end
   end
 
@@ -183,5 +195,20 @@ defmodule ConnectFour.GameServerTest do
     |> MapSet.put({x, y})
     |> MapSet.put({x - 1, y + 1})
     |> MapSet.put({x + 1, y - 1})
+  end
+
+  defp win_diag_fwd_board({x, y}) do
+    MapSet.new()
+    |> MapSet.put({x, y})
+    |> MapSet.put({x + 1, y + 1})
+    |> MapSet.put({x + 2, y + 2})
+    |> MapSet.put({x - 1, y - 1})
+  end
+
+  defp no_win_diag_fwd_board({x, y}) do
+    MapSet.new()
+    |> MapSet.put({x, y})
+    |> MapSet.put({x + 1, y + 1})
+    |> MapSet.put({x - 1, y - 1})
   end
 end
