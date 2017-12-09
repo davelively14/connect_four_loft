@@ -17,6 +17,10 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, {:drop_piece, col})
   end
 
+  def reset_game do
+    GenServer.call(__MODULE__, :reset_game)
+  end
+
   #############
   # Callbacks #
   #############
@@ -51,6 +55,11 @@ defmodule ConnectFour.GameServer do
     end
   end
 
+  def handle_call(:reset_game, _from, state) do
+    new_state = reset_state(state.height, state.width)
+    {:reply, :ok, new_state}
+  end
+
   #####################
   # Support Functions #
   #####################
@@ -65,7 +74,8 @@ defmodule ConnectFour.GameServer do
       height: height,
       width: width,
       current_player: :player_1,
-      finished: nil
+      finished: nil,
+      dimensions: %{height: height, width: width}
     }
   end
 
