@@ -52,8 +52,20 @@ defmodule ConnectFour.GameServerTest do
       assert initial_state.current_player == end_state.current_player
     end
 
-    test "returns winner when game is won" do
+    test "returns winner when game is won laterally" do
       assert {:ok, :player_1} == win_game_lateral()
+    end
+
+    test "returns winner when game is won vertically" do
+      assert {:ok, :player_1} == win_game_vertical()
+    end
+
+    test "returns winner when game is won diagonally - blackslash" do
+      assert {:ok, :player_1} == win_game_diag_back()
+    end
+
+    test "returns winner when game is won diagonally - forwardslash" do
+      assert {:ok, :player_1} == win_game_diag_fwd()
     end
 
     test "further attempts to play will result in error when game is already won" do
@@ -61,7 +73,6 @@ defmodule ConnectFour.GameServerTest do
       assert {:error, "player_1 already won the game."} == GameServer.drop_piece(2)
     end
 
-    @tag :this
     test "reports when draw occurs" do
       assert {:ok, :draw} == fill_board()
     end
@@ -160,6 +171,34 @@ defmodule ConnectFour.GameServerTest do
     GameServer.drop_piece(3)
     GameServer.drop_piece(3)
     GameServer.drop_piece(4)
+  end
+
+  defp win_game_diag_back do
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(4)
+  end
+
+  defp win_game_diag_fwd do
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(4)
+    GameServer.drop_piece(4)
+    GameServer.drop_piece(4)
+    GameServer.drop_piece(4)
+    GameServer.drop_piece(4)
+    GameServer.drop_piece(1)
   end
 
   defp win_lateral_board({x, y}) do
