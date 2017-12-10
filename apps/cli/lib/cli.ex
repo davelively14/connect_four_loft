@@ -1,18 +1,21 @@
 defmodule CLI do
-  @moduledoc """
-  Documentation for Cli.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  @height 6
+  @width 7
 
-  ## Examples
+  def start(_type, _params) do
+    import Supervisor.Spec
 
-      iex> Cli.hello
-      :world
+    children = [
+      worker(ConnectFour.GameServer, [%{height: @height, width: @width}], [])
+    ]
 
-  """
-  def hello do
-    :world
+    options = [
+      strategy: :one_for_one,
+      name: CLI.Supervisor
+    ]
+
+    Supervisor.start_link(children, options)
   end
 end
