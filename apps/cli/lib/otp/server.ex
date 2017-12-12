@@ -20,15 +20,28 @@ defmodule CLI.Server do
     IO.puts "----------"
     selection =
       IO.gets "Make a selection: "
-      |> sanitize_selection
+
+    selection = selection |> sanitize_selection
 
     options = ["1", "Q"]
 
     if is_valid?(selection, options) do
-      IO.puts "valid"
+      case selection do
+        "Q" ->
+          IO.puts "Thanks for playing!"
+        "1" ->
+          select(:main_menu)
+        _ ->
+          select(:main_menu)
+      end
     else
-      IO.puts "invalid"
+      IO.puts "\nInvalid selection, please try again\n"
+      select(:main_menu)
     end
+  end
+
+  def terminate(_, _) do
+    IO.puts "Thanks for playing"
   end
 
   ########################
@@ -46,4 +59,9 @@ defmodule CLI.Server do
   end
 
   defp sanitize_selection(selection), do: selection |> String.trim_trailing |> String.upcase
+
+  defp invalid(destination) do
+    IO.puts "\nInvalid selection, please try again\n"
+    select(destination)
+  end
 end
