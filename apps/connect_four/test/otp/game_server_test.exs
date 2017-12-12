@@ -3,7 +3,7 @@ defmodule ConnectFour.GameServerTest do
   alias ConnectFour.GameServer
 
   setup do
-    ConnectFour.start(nil, %{height: 6, width: 7})
+    GameServer.start_link(%{height: 6, width: 7})
     initial_state = GameServer.get_state
     {:ok, %{initial_state: initial_state}}
   end
