@@ -3,7 +3,11 @@ defmodule CLI.ServerTest do
   alias CLI.Server
   import ExUnit.CaptureIO
 
-  setup do
+  setup context do
+    if context[:start_game_server] do
+      ConnectFour.start(nil)
+    end
+
     start_fn = fn () ->
       CLI.start(nil, nil)
     end
@@ -12,7 +16,11 @@ defmodule CLI.ServerTest do
       Server.select(:main_menu)
     end
 
-    {:ok, %{start_fn: start_fn, main_menu: main_menu}}
+    new_two_player = fn () ->
+      Server.select({:new_game, 2})
+    end
+
+    {:ok, %{start_fn: start_fn, main_menu: main_menu, new_two_player: new_two_player}}
   end
 
   # Note that passing "Q" as the first argument into all of the capture_io
@@ -40,6 +48,23 @@ defmodule CLI.ServerTest do
 
     test "invalid selection informs the user of such and loads main menu again", %{main_menu: main_menu} do
       assert capture_io([input: "9\nq"], main_menu) =~ "Invalid selection, please try again\n\nMain Menu"
+    end
+  end
+
+  describe "select({:new_game, 2})" do
+    @tag :start_game_server
+    test "asks for first player's name", %{new_two_player: new_two_player} do
+      assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter first player's name"
+    end
+
+    @tag :start_game_server
+    test "asks for second player's name", %{new_two_player: new_two_player} do
+      assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter second player's name"
+    end
+
+    @tag :start_game_server
+    test "after entering names, launches the game", %{new_two_player: new_two_player} do
+      assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Let's play!"
     end
   end
 
