@@ -17,12 +17,16 @@ defmodule ConnectFour.AIServer do
     GenServer.call(__MODULE__, {:set_difficulty, difficulty})
   end
 
+  def reset_ai do
+    GenServer.call(__MODULE__, :reset_ai)
+  end
+
   #############
   # Callbacks #
   #############
 
   def init(difficulty) do
-    {:ok, reset_state(difficulty)}
+    {:ok, initial_state(difficulty)}
   end
 
   def handle_call(:get_state, _from, state) do
@@ -37,12 +41,17 @@ defmodule ConnectFour.AIServer do
     end
   end
 
+  def handle_call(:reset_ai, _from, state) do
+    {:reply, :ok, initial_state(state.initial_difficulty)}
+  end
+
   #####################
   # Support Functions #
   #####################
 
-  defp reset_state(difficulty) do
+  defp initial_state(difficulty) do
     %{
+      initial_difficulty: difficulty,
       difficulty: difficulty
     }
   end
