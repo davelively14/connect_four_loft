@@ -1,4 +1,6 @@
 defmodule CLI.Server do
+  alias ConnectFour.GameServer
+
   #######
   # API #
   #######
@@ -28,20 +30,27 @@ defmodule CLI.Server do
     if is_valid?(selection, options) do
       case selection do
         "Q" ->
-          IO.puts "Thanks for playing!"
+          exit_game()
         "1" ->
-          select(:main_menu)
+          select({:new_game, 2})
         _ ->
           select(:main_menu)
       end
     else
-      IO.puts "\nInvalid selection, please try again\n"
-      select(:main_menu)
+      invalid(:main_menu)
     end
   end
 
-  def terminate(_, _) do
-    IO.puts "Thanks for playing"
+  def select({:new_game, 2}) do
+    player_1 = IO.gets "Enter first player's name: "
+    player_2 = IO.gets "Enter second player's name: "
+    select({:play_game, 2, %{player_1: player_1, player_2: player_2}})
+  end
+
+  def select({:play_game, 2, state}) do
+    IO.puts "Let's play!"
+    IO.puts "Enter 'q' at any time to quit the game."
+    IO.gets "#{state[GameServer.current_player]}'s turn: "
   end
 
   ########################
@@ -63,5 +72,9 @@ defmodule CLI.Server do
   defp invalid(destination) do
     IO.puts "\nInvalid selection, please try again\n"
     select(destination)
+  end
+
+  defp exit_game do
+    IO.puts "Thanks for playing!"
   end
 end
