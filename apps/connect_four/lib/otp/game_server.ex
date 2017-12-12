@@ -81,6 +81,7 @@ defmodule ConnectFour.GameServer do
       },
       height: height,
       width: width,
+      avail_cols: 1..width |> Enum.to_list,
       current_player: :player_1,
       finished: nil,
       dimensions: %{height: height, width: width}
@@ -112,11 +113,19 @@ defmodule ConnectFour.GameServer do
       Map.merge(state.board, Map.new([{state.current_player, new_player_board}]))
       |> Map.merge(%{free: new_free})
 
+    new_avail_cols =
+      if loc |> elem(1) == state.height do
+        remove(state.avail_cols, loc |> elem(0))
+      else
+        state.avail_cols
+      end
+
     Map.merge(
       state,
       %{
         board: new_board,
-        finished: check_win_or_draw(state.current_player, new_free, new_player_board, loc)
+        finished: check_win_or_draw(state.current_player, new_free, new_player_board, loc),
+        avail_cols: new_avail_cols
       }
     )
   end
@@ -212,6 +221,16 @@ defmodule ConnectFour.GameServer do
       check_down_left(streak + 1, player_board, {x - 1, y - 1})
     else
       streak
+    end
+  end
+
+  defp remove(avail_cols, col), do: remove(avail_cols, col, [])
+  defp remove([], _, result), do: result |> Enum.reverse
+  defp remove([head | tail], col, result) do
+    if head == col do
+      remove(tail, col, result)
+    else
+      remove(tail, col, [head | result])
     end
   end
 end
