@@ -42,10 +42,11 @@ defmodule CLI.Server do
   end
 
   def select({:new_game, 2}) do
+    GameServer.reset_game()
     player_1 = IO.gets "Enter first player's name: "
     player_2 = IO.gets "Enter second player's name: "
-    select({:play_game, 2, %{player_1: player_1, player_2: player_2}})
     IO.puts "Let's play!\nEnter 'q' at any time to quit the game."
+    select({:play_game, 2, %{player_1: player_1, player_2: player_2}})
   end
 
   def select({:play_game, 2, state}) do
@@ -53,7 +54,7 @@ defmodule CLI.Server do
     options = prep_options(game_state.avail_cols)
 
     IO.puts "Available columns: #{Enum.join(game_state.avail_cols, ", ")}"
-    selection = IO.gets "#{state[game_state.current_player]}'s turn. Select a column: "
+    selection = IO.gets "#{state[game_state.current_player] |> String.trim_trailing}'s turn. Select a column: "
 
     selection = selection |> sanitize_selection
 
@@ -116,5 +117,5 @@ defmodule CLI.Server do
   defp prep_options([head | tail], result), do: prep_options(tail, [to_string(head) | result])
 
   defp print_result(:draw), do: IO.puts "The game has ended in a draw! Try again...\n\n"
-  defp print_result(winner), do: IO.puts "Congrats! #{winner} has won the game!\n\n"
+  defp print_result(winner), do: IO.puts "Congrats! #{winner |> String.trim_trailing} has won the game!\n\n"
 end
