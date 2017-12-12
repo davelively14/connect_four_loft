@@ -17,5 +17,6 @@ defmodule CLI do
     ]
 
     Supervisor.start_link(children, options)
+    CLI.Server.start
   end
 end
