@@ -21,6 +21,10 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, :reset_game)
   end
 
+  def current_player do
+    GenServer.call(__MODULE__, :current_player)
+  end
+
   #############
   # Callbacks #
   #############
@@ -58,6 +62,10 @@ defmodule ConnectFour.GameServer do
   def handle_call(:reset_game, _from, state) do
     new_state = reset_state(state.height, state.width)
     {:reply, :ok, new_state}
+  end
+
+  def handle_call(:current_player, _from, state) do
+    {:reply, state.current_player, state}
   end
 
   #####################
