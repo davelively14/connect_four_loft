@@ -15,6 +15,7 @@ defmodule ConnectFour.GameServerTest do
       assert 7 * 6 == MapSet.size state.board.free
       assert 0 == MapSet.size state.board.player_1
       assert 0 == MapSet.size state.board.player_2
+      assert state.avail_cols == [1,2,3,4,5,6,7]
 
       assert is_atom state.current_player
       assert is_integer state.height
@@ -82,6 +83,17 @@ defmodule ConnectFour.GameServerTest do
     test "further attempts to play will result in error when game is already in draw" do
       fill_board()
       assert {:error, "The game ended in a draw."} == GameServer.drop_piece(1)
+    end
+
+    test "filling a row will result in dropping that row from avail_cols" do
+      GameServer.drop_piece(1)
+      GameServer.drop_piece(1)
+      GameServer.drop_piece(1)
+      GameServer.drop_piece(1)
+      GameServer.drop_piece(1)
+      assert GameServer.get_state |> Map.get(:avail_cols) == [1,2,3,4,5,6,7]
+      GameServer.drop_piece(1)
+      assert GameServer.get_state |> Map.get(:avail_cols) == [2,3,4,5,6,7]
     end
   end
 
@@ -168,6 +180,14 @@ defmodule ConnectFour.GameServerTest do
 
       reset_state = GameServer.get_state()
       assert reset_state == initial_state
+    end
+  end
+
+  describe "current_player/0" do
+    test "returns the current player" do
+      assert GameServer.current_player == :player_1
+      GameServer.drop_piece(1)
+      assert GameServer.current_player == :player_2
     end
   end
 
