@@ -171,6 +171,14 @@ defmodule ConnectFour.GameServerTest do
     end
   end
 
+  describe "current_player/0" do
+    test "returns the current player" do
+      assert GameServer.current_player == :player_1
+      GameServer.drop_piece(1)
+      assert GameServer.current_player == :player_2
+    end
+  end
+
   #####################
   # Private Functions #
   #####################
