@@ -81,6 +81,7 @@ defmodule ConnectFour.GameServer do
       },
       height: height,
       width: width,
+      last_play: nil,
       avail_cols: 1..width |> Enum.to_list,
       current_player: :player_1,
       finished: nil,
@@ -125,7 +126,8 @@ defmodule ConnectFour.GameServer do
       %{
         board: new_board,
         finished: check_win_or_draw(state.current_player, new_free, new_player_board, loc),
-        avail_cols: new_avail_cols
+        avail_cols: new_avail_cols,
+        last_play: {state.current_player, loc}
       }
     )
   end
