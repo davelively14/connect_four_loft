@@ -6,8 +6,7 @@ defmodule ConnectFour.AIServerTest do
     GameServer.start_link(%{height: 6, width: 7})
     AIServer.start_link()
     initial_ai_state = AIServer.get_state
-    initial_game_state = GameServer.get_state
-    {:ok, %{initial_game_state: initial_game_state, initial_ai_state: initial_ai_state}}
+    {:ok, %{initial_ai_state: initial_ai_state}}
   end
 
   describe "get_state/0" do
@@ -42,5 +41,49 @@ defmodule ConnectFour.AIServerTest do
       AIServer.reset_ai()
       assert AIServer.get_state == initial_ai_state
     end
+  end
+
+  # describe "make_move: easy level" do
+  #   test "makes a move when passed the state of a game" do
+  #     initial_state = GameServer.get_state()
+  #     AIServer.make_move()
+  #     new_state = GameServer.get_state()
+  #
+  #     refute initial_state == new_state
+  #     assert initial_state.player_1 |> MapSet.size == 0
+  #     assert new_state.player_1 |> MapSet.size == 1
+  #   end
+  # end
+
+  describe "block_opponent?/1" do
+    test "will block opponent about to win vertically" do
+      setup_vert_win()
+      assert AIServer.block_opponent?(GameServer.get_state()) == 1
+    end
+
+    test "will block opponenet if about to win laterally" do
+      setup_lat_win()
+      assert AIServer.block_opponent?(GameServer.get_state()) == 3
+    end
+  end
+
+  #####################
+  # Private Functions #
+  #####################
+
+  defp setup_vert_win do
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(1)
+  end
+
+  defp setup_lat_win do
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(1)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(2)
+    GameServer.drop_piece(3)
   end
 end
