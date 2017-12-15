@@ -57,12 +57,12 @@ defmodule ConnectFour.AIServerTest do
 
   describe "block_opponent?/1" do
     test "will block opponent about to win vertically" do
-      setup_vert_win()
+      setup_vert_3()
       assert AIServer.block_opponent?(GameServer.get_state()) == 1
     end
 
     test "will block opponenet if about to win laterally" do
-      setup_lat_win()
+      setup_lat_3()
       assert AIServer.block_opponent?(GameServer.get_state()) == 3
     end
   end
@@ -71,7 +71,7 @@ defmodule ConnectFour.AIServerTest do
   # Private Functions #
   #####################
 
-  defp setup_vert_win do
+  defp setup_vert_3 do
     GameServer.drop_piece(1)
     GameServer.drop_piece(2)
     GameServer.drop_piece(1)
@@ -79,7 +79,7 @@ defmodule ConnectFour.AIServerTest do
     GameServer.drop_piece(1)
   end
 
-  defp setup_lat_win do
+  defp setup_lat_3 do
     GameServer.drop_piece(1)
     GameServer.drop_piece(1)
     GameServer.drop_piece(2)
