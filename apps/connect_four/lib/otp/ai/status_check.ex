@@ -30,4 +30,24 @@ defmodule ConnectFour.StatusCheck do
       false
     end
   end
+
+  @doc """
+  Returns column to block if needed. If no block needed, returns nil.
+
+  ## Examples
+
+      iex> block_vert?(valid_board, :player_1, {1, 4})
+      1
+      iex> block_vert?(valid_bard, :player_1, {2, 2})
+      nil
+      iex> block_vert?(valid_board, :player_1, {1, 6})
+      nil
+  """
+  def block_vert?(board, player, loc = {x, y}) do
+    if check_vert(board, player, loc, 3) && MapSet.member?(board.free, {x, y + 1}) do
+      x
+    else
+      nil
+    end
+  end
 end
