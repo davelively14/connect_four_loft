@@ -1,15 +1,20 @@
 defmodule ConnectFour.StatusCheckTest do
   use ExUnit.Case
+  alias ConnectFour.StatusCheck
 
-  describe "block_opponent?/1" do
-    test "will block opponent about to win vertically" do
-      setup_vert_win()
-      assert AIServer.block_opponent?(GameServer.get_state()) == 1
+  describe "check_vert/3" do
+    test "returns column with correct consecutive pieces met" do
+      assert StatusCheck.check_vert(player_board_3_vert(), {1, 3}, 3) == 1
     end
 
-    test "will block opponenet if about to win laterally" do
-      setup_lat_win()
-      assert AIServer.block_opponent?(GameServer.get_state()) == 3
+    test "does not return column if not enough consecutive pieces" do
+      refute StatusCheck.check_vert(player_board_3_vert(), {1, 3}, 4)
+      refute StatusCheck.check_vert(MapSet.new(), {1, 4}, 4)
+      refute StatusCheck.check_vert(MapSet.new(), {1, 4}, 1)
+    end
+
+    test "returns column if more than necessary consecutive pieces" do
+      assert StatusCheck.check_vert(player_board_3_vert(), {1, 3}, 2) == 1
     end
   end
 
@@ -17,19 +22,7 @@ defmodule ConnectFour.StatusCheckTest do
   # Private Functions #
   #####################
 
-  defp setup_vert_win do
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(1)
-  end
-
-  defp setup_lat_win do
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(3)
+  defp player_board_3_vert do
+    MapSet.new([{1, 3}, {1, 2}, {1, 1}])
   end
 end
