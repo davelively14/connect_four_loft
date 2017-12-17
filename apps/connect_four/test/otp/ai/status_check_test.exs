@@ -6,17 +6,16 @@ defmodule ConnectFour.StatusCheckTest do
     GameServer.start_link(%{height: 6, width: 7})
 
     cond do
-      context[:setup_board_3_vert] ->
-        setup_board_3_vert()
-        game_state = %{board: board, last_play: {player, loc}} = GameServer.get_state()
-        {:ok, %{game_state: game_state, board: board, player: player, loc: loc}}
-      context[:setup_board_3_lat] ->
-        setup_board_3_lat()
-        game_state = %{board: board, last_play: {player, loc}} = GameServer.get_state()
-        {:ok, %{game_state: game_state, board: board, player: player, loc: loc}}
-      true ->
-        :ok
+      context[:setup_board_3_vert] -> setup_board_3_vert()
+      context[:setup_board_3_lat_mid] -> setup_board_3_lat_mid()
+      context[:setup_board_3_lat_left] -> setup_board_3_lat_left()
+      context[:setup_board_3_lat_row_2] -> setup_board_3_lat_row_2()
+      true -> nil
     end
+
+    game_state = %{board: board} = GameServer.get_state()
+    if game_state.last_play, do: {player, loc} = game_state.last_play
+    {:ok, %{game_state: game_state, board: board, player: player, loc: loc}}
   end
 
   describe "check_vert/3" do
@@ -73,6 +72,24 @@ defmodule ConnectFour.StatusCheckTest do
     end
   end
 
+  describe "check_left/3" do
+    @tag :setup_board_3_lat_mid
+    test "returns streak and column 1 for blocking spot to the left", %{board: board, player: player, loc: loc} do
+      assert StatusCheck.check_left(board, player, loc) == {2, 1}
+    end
+
+    @tag :setup_board_3_lat_left
+    test "returns streak and nil column since no block to the left", %{board: board, player: player, loc: loc} do
+      assert StatusCheck.check_left(board, player, loc) == {2, nil}
+    end
+
+    @tag :setup_board_3_lat_row_2
+    test "returns streak and nil column since no block needed yet", %{board: board, player: player, loc: loc} do
+      IO.inspect board
+      assert StatusCheck.ckeck_left(board, player, loc) == {2, nil}
+    end
+  end
+
   #####################
   # Private Functions #
   #####################
@@ -85,11 +102,29 @@ defmodule ConnectFour.StatusCheckTest do
     GameServer.drop_piece(1)
   end
 
-  defp setup_board_3_lat do
+  defp setup_board_3_lat_mid do
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(5)
+    GameServer.drop_piece(5)
+    GameServer.drop_piece(4)
+  end
+
+  defp setup_board_3_lat_left do
     GameServer.drop_piece(1)
     GameServer.drop_piece(1)
     GameServer.drop_piece(2)
     GameServer.drop_piece(2)
     GameServer.drop_piece(3)
+  end
+
+  defp setup_board_3_lat_row_2 do
+    GameServer.drop_piece(7)
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(3)
+    GameServer.drop_piece(5)
+    GameServer.drop_piece(5)
+    GameServer.drop_piece(4)
+    GameServer.drop_piece(4)
   end
 end
