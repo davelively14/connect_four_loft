@@ -9,6 +9,7 @@ defmodule ConnectFour.StatusCheckTest do
       context[:setup_board_3_vert] -> setup_board_3_vert()
       context[:setup_board_3_lat_mid] -> setup_board_3_lat_mid()
       context[:setup_board_3_lat_left] -> setup_board_3_lat_left()
+      context[:setup_board_3_lat_right] -> setup_board_3_lat_right()
       context[:setup_board_3_lat_row_2] -> setup_board_3_lat_row_2()
       true -> nil
     end
@@ -72,21 +73,27 @@ defmodule ConnectFour.StatusCheckTest do
     end
   end
 
-  describe "check_left/3" do
+  describe "check_left/4" do
     @tag :setup_board_3_lat_mid
-    test "returns streak and column 1 for blocking spot to the left", %{board: board, player: player, loc: loc} do
-      assert StatusCheck.check_left(board, player, loc) == {2, 1}
+    test "returns correct streak and column for blocking spot", %{board: board, player: player, loc: loc} do
+      assert StatusCheck.check_left(board, player, loc, 3) == {2, 1}
     end
 
     @tag :setup_board_3_lat_left
     test "returns streak and nil column since no block to the left", %{board: board, player: player, loc: loc} do
-      assert StatusCheck.check_left(board, player, loc) == {2, nil}
+      assert StatusCheck.check_left(board, player, loc, 3) == {3, nil}
+    end
+  end
+
+  describe "check_right/4" do
+    @tag :setup_board_3_lat_mid
+    test "returns correct streak and column for blocking spot", %{board: board, player: player, loc: loc} do
+      assert StatusCheck.check_right(board, player, loc, 3) == {2, 6}
     end
 
-    @tag :setup_board_3_lat_row_2
-    test "returns streak and nil column since no block needed yet", %{board: board, player: player, loc: loc} do
-      IO.inspect board
-      assert StatusCheck.ckeck_left(board, player, loc) == {2, nil}
+    @tag :setup_board_3_lat_right
+    test "returns streak and nil column for blocking spot", %{board: board, player: player, loc: loc} do
+      assert StatusCheck.check_right(board, player, loc, 3) == {2, 6}
     end
   end
 
@@ -116,6 +123,14 @@ defmodule ConnectFour.StatusCheckTest do
     GameServer.drop_piece(2)
     GameServer.drop_piece(2)
     GameServer.drop_piece(3)
+  end
+
+  defp setup_board_3_lat_right do
+    GameServer.drop_piece(7)
+    GameServer.drop_piece(7)
+    GameServer.drop_piece(6)
+    GameServer.drop_piece(6)
+    GameServer.drop_piece(5)
   end
 
   defp setup_board_3_lat_row_2 do
