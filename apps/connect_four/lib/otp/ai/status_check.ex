@@ -122,7 +122,7 @@ defmodule ConnectFour.StatusCheck do
     end
   end
 
-  def find_open(free, col), do: find_open(MapSet.to_list(free), col, nil)
+  def find_open(board, col), do: find_open(MapSet.to_list(board[:free]), col, nil)
   defp find_open([], _, lowest), do: lowest
   defp find_open([head | tail], col, lowest) do
     cond do
