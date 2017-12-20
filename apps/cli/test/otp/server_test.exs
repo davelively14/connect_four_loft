@@ -21,11 +21,15 @@ defmodule CLI.ServerTest do
       Server.select({:new_game, 2})
     end
 
+    new_one_player_easy = fn () ->
+      Server.select({:new_game, :easy})
+    end
+
     game_env = fn () ->
       Server.select({:play_game, 2, %{player_1: "player 1", player_2: "player 2"}})
     end
 
-    {:ok, %{start_fn: start_fn, main_menu: main_menu, new_two_player: new_two_player, game_env: game_env}}
+    {:ok, %{start_fn: start_fn, main_menu: main_menu, new_two_player: new_two_player, new_one_player_easy: new_one_player_easy, game_env: game_env}}
   end
 
   # Note that passing "Q" as the first argument into all of the capture_io
@@ -57,42 +61,51 @@ defmodule CLI.ServerTest do
   end
 
   describe "select({:new_game, 2})" do
-    @tag :start_game_server
+    @describetag :start_game_server
+
     test "asks for first player's name", %{new_two_player: new_two_player} do
       assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter first player's name"
     end
 
-    @tag :start_game_server
     test "asks for second player's name", %{new_two_player: new_two_player} do
       assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter second player's name"
     end
 
-    @tag :start_game_server
-    test "after entering names, launches the game", %{new_two_player: new_two_player} do
+    test "after entering names, displays game launch greeting", %{new_two_player: new_two_player} do
       assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Let's play!"
     end
   end
 
+  describe "select({:new_game, :easy})" do
+    @describetag :start_game_server
+
+    test "asks for player's name", %{new_one_player_easy: new_one_player_easy} do
+      assert capture_io([input: "a\nq"], new_one_player_easy) =~ "Enter player's name"
+    end
+
+    test "after entering name, displays game launch meeting", %{new_one_player_easy: new_one_player_easy} do
+      assert capture_io([input: "a\nq"], new_one_player_easy) =~ "Let's play!"
+    end
+  end
+
   describe "select({:play_game, 2, state})" do
-    @tag :start_game_server
+    @describetag :start_game_server
+
     test "correctly alternates player", %{game_env: game_env} do
       result = capture_io([input: "1\n1\nq"], game_env)
       assert result =~ "player 1's turn"
       assert result =~ "player 2's turn"
     end
 
-    @tag :start_game_server
     test "handles a win", %{game_env: game_env} do
       assert capture_io([input: "1\n2\n1\n2\n1\n2\n1\nq"], game_env) =~ "Congrats! player 1 has won the game!"
     end
 
-    @tag :start_game_server
     test "handles a draw", %{game_env: game_env} do
       fill_board()
       assert capture_io([input: "7\nq"], game_env) =~ "The game has ended in a draw! Try again..."
     end
 
-    @tag :start_game_server
     test "handles invalid input", %{game_env: game_env} do
       assert capture_io("adsf\nq", game_env) =~ "Invalid selection"
       fill_board()
