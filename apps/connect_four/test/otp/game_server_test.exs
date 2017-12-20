@@ -3,7 +3,7 @@ defmodule ConnectFour.GameServerTest do
   alias ConnectFour.GameServer
 
   setup do
-    ConnectFour.start(nil, %{height: 6, width: 7})
+    GameServer.start_link(%{height: 6, width: 7})
     initial_state = GameServer.get_state
     {:ok, %{initial_state: initial_state}}
   end
@@ -16,6 +16,7 @@ defmodule ConnectFour.GameServerTest do
       assert 0 == MapSet.size state.board.player_1
       assert 0 == MapSet.size state.board.player_2
       assert state.avail_cols == [1,2,3,4,5,6,7]
+      assert state.last_play == nil
 
       assert is_atom state.current_player
       assert is_integer state.height
@@ -94,6 +95,12 @@ defmodule ConnectFour.GameServerTest do
       assert GameServer.get_state |> Map.get(:avail_cols) == [1,2,3,4,5,6,7]
       GameServer.drop_piece(1)
       assert GameServer.get_state |> Map.get(:avail_cols) == [2,3,4,5,6,7]
+    end
+
+    test "records last play" do
+      assert GameServer.get_state |> Map.get(:last_play) == nil
+      GameServer.drop_piece(1)
+      assert GameServer.get_state |> Map.get(:last_play) == {:player_1, {1,1}}
     end
   end
 
