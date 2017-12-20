@@ -139,24 +139,24 @@ defmodule ConnectFour.StatusCheckTest do
 
   describe "find_open/2" do
     test "returns correct column on an empty board", %{board: board} do
-      assert StatusCheck.find_open(board[:free], 1) == {1, 1}
-      assert StatusCheck.find_open(board[:free], 3) == {3, 1}
+      assert StatusCheck.find_open(board, 1) == {1, 1}
+      assert StatusCheck.find_open(board, 3) == {3, 1}
     end
 
     @tag :setup_board_vert
     test "returns correct column with some pieces in place", %{board: board} do
-      assert StatusCheck.find_open(board[:free], 1) == {1, 4}
-      assert StatusCheck.find_open(board[:free], 2) == {2, 3}
-      assert StatusCheck.find_open(board[:free], 3) == {3, 1}
-      assert StatusCheck.find_open(board[:free], 4) == {4, 1}
-      assert StatusCheck.find_open(board[:free], 5) == {5, 1}
-      assert StatusCheck.find_open(board[:free], 6) == {6, 1}
-      assert StatusCheck.find_open(board[:free], 7) == {7, 1}
+      assert StatusCheck.find_open(board, 1) == {1, 4}
+      assert StatusCheck.find_open(board, 2) == {2, 3}
+      assert StatusCheck.find_open(board, 3) == {3, 1}
+      assert StatusCheck.find_open(board, 4) == {4, 1}
+      assert StatusCheck.find_open(board, 5) == {5, 1}
+      assert StatusCheck.find_open(board, 6) == {6, 1}
+      assert StatusCheck.find_open(board, 7) == {7, 1}
     end
 
     @tag :setup_board_full
     test "returns nil if no open moves for a column", %{board: board} do
-      assert StatusCheck.find_open(board[:free], 1) == nil
+      assert StatusCheck.find_open(board, 1) == nil
     end
   end
 

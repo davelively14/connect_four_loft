@@ -8,14 +8,19 @@ defmodule ConnectFour.StatusCheck do
 
   ## Examples
 
-      iex> must_block(valid_board, :opposing_player, avail_cols)
+      iex> get_blocks(valid_board, :opposing_player, avail_cols)
       [1]
-      iex> must_block(valid_board, :opposing_player, avail_cols)
+      iex> get_blocks(valid_board, :opposing_player, avail_cols)
       []
   """
-  def must_block(board, player, avail_cols) do
-    nil
-  end
+  # def get_blocks(board, player, avail_cols), do: get_blocks(board, player, avail_cols, [])
+  # defp get_blocks(_, _, [], to_block), do: to_block
+  # defp get_blocks(board, player, [head | tail], to_block) do
+  #   result = check_win_or_draw(board, player, find_open(board[:free], head))
+  #   # cond do
+  #   #
+  #   # end
+  # end
 
   @doc """
   Returns winning player, draw, or nil for a provided board if a piece were to
@@ -114,6 +119,17 @@ defmodule ConnectFour.StatusCheck do
       check_down_left(streak + 1, player_board, {x - 1, y - 1})
     else
       streak
+    end
+  end
+
+  def find_open(free, col), do: find_open(MapSet.to_list(free), col, nil)
+  defp find_open([], _, lowest), do: lowest
+  defp find_open([head | tail], col, lowest) do
+    cond do
+      elem(head, 0) == col && (lowest && elem(head, 1) < elem(lowest, 1) || !lowest) ->
+        find_open(tail, col, head)
+      true ->
+        find_open(tail, col, lowest)
     end
   end
 end
