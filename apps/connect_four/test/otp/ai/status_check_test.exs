@@ -17,17 +17,43 @@ defmodule ConnectFour.StatusCheckTest do
     game_state = %{board: board, avail_cols: avail_cols} = GameServer.get_state()
 
     {player, loc} =
-      if game_state.last_play, do: game_state.last_play, else: {nil, nil}
+      if game_state.last_play, do: game_state.last_play, else: {:player_1, nil}
 
     {:ok, %{game_state: game_state, board: board, player: player, loc: loc, avail_cols: avail_cols}}
   end
 
-  # describe "get_blocks/3" do
-  #   @tag :setup_board_vert
-  #   test "returns correct column required for block", %{board: board, player: player, avail_cols: avail_cols} do
-  #     assert StatusCheck.get_blocks(board, player, avail_cols)
-  #   end
-  # end
+  describe "get_block_cols/3" do
+    @tag :setup_board_vert
+    test "returns correct column required for blocking vertically", %{board: board, player: player, avail_cols: avail_cols} do
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == [1]
+    end
+
+    @tag :setup_board_lat
+    test "returns multiple columns for blocking when multiple ways to win", %{board: board, player: player, avail_cols: avail_cols} do
+      result = StatusCheck.get_block_cols(board, player, avail_cols)
+
+      assert result == [2, 6] || result == [6, 2]
+    end
+
+    @tag :setup_board_diag_back
+    test "returns column for blocking a diagonal back", %{board: board, player: player, avail_cols: avail_cols} do
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == [1]
+    end
+
+    @tag :setup_board_diag_fwd
+    test "returns column for blocking a diagonal forward", %{board: board, player: player, avail_cols: avail_cols} do
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == [4]
+    end
+
+    @tag :setup_board_full
+    test "returns empty list if board is full", %{board: board, player: player, avail_cols: avail_cols} do
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == []
+    end
+
+    test "returns empty list if no threat to win", %{board: board, player: player, avail_cols: avail_cols} do
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == []
+    end
+  end
 
   describe "check_win_or_draw/3" do
     @tag :setup_board_vert
