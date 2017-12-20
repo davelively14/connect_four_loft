@@ -8,19 +8,24 @@ defmodule ConnectFour.StatusCheck do
 
   ## Examples
 
-      iex> get_blocks(valid_board, :opposing_player, avail_cols)
+      iex> get_block_cols(valid_board, :opposing_player, avail_cols)
       [1]
-      iex> get_blocks(valid_board, :opposing_player, avail_cols)
+      iex> get_block_cols(valid_board, :opposing_player, avail_cols)
       []
   """
-  # def get_blocks(board, player, avail_cols), do: get_blocks(board, player, avail_cols, [])
-  # defp get_blocks(_, _, [], to_block), do: to_block
-  # defp get_blocks(board, player, [head | tail], to_block) do
-  #   result = check_win_or_draw(board, player, find_open(board[:free], head))
-  #   # cond do
-  #   #
-  #   # end
-  # end
+  def get_block_cols(board, player, avail_cols), do: get_block_cols(board, player, avail_cols, [])
+  defp get_block_cols(_, _, [], to_block), do: to_block
+  defp get_block_cols(board, player, [head | tail], to_block) do
+    if loc = find_open(board, head) do
+      if check_win_or_draw(board, player, loc) == player do
+        get_block_cols(board, player, tail, [elem(loc, 0) | to_block])
+      else
+        get_block_cols(board, player, tail, to_block)
+      end
+    else
+      get_block_cols(board, player, tail, to_block)
+    end
+  end
 
   @doc """
   Returns winning player, draw, or nil for a provided board if a piece were to
