@@ -43,27 +43,15 @@ defmodule ConnectFour.AIServerTest do
     end
   end
 
-  # describe "make_move: easy level" do
-  #   test "makes a move when passed the state of a game" do
-  #     initial_state = GameServer.get_state()
-  #     AIServer.make_move()
-  #     new_state = GameServer.get_state()
-  #
-  #     refute initial_state == new_state
-  #     assert initial_state.player_1 |> MapSet.size == 0
-  #     assert new_state.player_1 |> MapSet.size == 1
-  #   end
-  # end
+  describe "make_move: easy level" do
+    test "makes a move when passed the state of a game" do
+      initial_state = GameServer.get_state()
+      AIServer.make_move()
+      new_state = GameServer.get_state()
 
-  describe "block_opponent?/1" do
-    test "will block opponent about to win vertically" do
-      setup_vert_3()
-      assert AIServer.block_opponent?(GameServer.get_state()) == 1
-    end
-
-    test "will block opponenet if about to win laterally" do
-      setup_lat_3()
-      assert AIServer.block_opponent?(GameServer.get_state()) == 3
+      refute initial_state == new_state
+      assert initial_state.board.player_1 |> MapSet.size == 0
+      assert new_state.board.player_1 |> MapSet.size == 1
     end
   end
 
