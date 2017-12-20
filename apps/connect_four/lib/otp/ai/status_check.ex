@@ -13,20 +13,33 @@ defmodule ConnectFour.StatusCheck do
       iex> must_block(valid_board, :opposing_player, avail_cols)
       []
   """
-  # def must_block(board, player, avail_cols) do
-  #   # check
-  # end
-  #
-  # def check_win_or_draw(player, free, player_board, loc) do
-  #   cond do
-  #     check_lateral(player_board, loc) -> player
-  #     check_vertical(player_board, loc) -> player
-  #     check_diag_back(player_board, loc) -> player
-  #     check_diag_fwd(player_board, loc) -> player
-  #     MapSet.size(free) == 0 -> :draw
-  #     true -> nil
-  #   end
-  # end
+  def must_block(board, player, avail_cols) do
+    nil
+  end
+
+  @doc """
+  Returns winning player, draw, or nil for a provided board if a piece were to
+  be played at a given location.
+
+  ## Examples
+
+      iex> check_win_or_draw(valid_board, :player_1, {1, 4})
+      :player_1
+      iex> check_win_or_draw(valid_board, :player_1, {4, 1})
+      nil
+      iex> check_win_or_draw(valid_board, :player_1, {7, 6})
+      :draw
+  """
+  def check_win_or_draw(board, player, loc) do
+    cond do
+      check_lateral(board[player], loc) -> player
+      check_vertical(board[player], loc) -> player
+      check_diag_back(board[player], loc) -> player
+      check_diag_fwd(board[player], loc) -> player
+      MapSet.size(board[:free]) == 0 -> :draw
+      true -> nil
+    end
+  end
 
   def check_lateral(player_board, {x, y}) do
     check_left(1, player_board, {x - 1, y}) |> check_right(player_board, {x + 1, y}) == 4
