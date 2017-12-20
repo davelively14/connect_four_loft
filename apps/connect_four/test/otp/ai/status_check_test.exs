@@ -22,6 +22,57 @@ defmodule ConnectFour.StatusCheckTest do
     {:ok, %{game_state: game_state, board: board, player: player, loc: loc}}
   end
 
+  describe "check_win_or_draw/3" do
+    @tag :setup_board_vert
+    test "returns player when a player's piece at loc would win vertically", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {1,4}) == player
+    end
+
+    @tag :setup_board_vert
+    test "returns nil when a player's piece at loc would not win vertically", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {1,3}) == nil
+    end
+
+    @tag :setup_board_lat
+    test "returns player when a player's piece at loc would win laterally", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {6,1}) == player
+      assert StatusCheck.check_win_or_draw(board, player, {2,1}) == player
+    end
+
+    @tag :setup_board_lat
+    test "returns nil when a player's piece at loc would not win laterally", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {1,1}) == nil
+      assert StatusCheck.check_win_or_draw(board, player, {7,1}) == nil
+      assert StatusCheck.check_win_or_draw(board, player, {3,1}) == nil
+    end
+
+    @tag :setup_board_diag_back
+    test "returns player when a player's piece at loc would win diagonally backward", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {1,4}) == player
+    end
+
+    @tag :setup_board_diag_back
+    test "returns nil when a player's piece at loc would not win diagonally backward", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {2,4}) == nil
+      assert StatusCheck.check_win_or_draw(board, player, {3,3}) == nil
+    end
+
+    @tag :setup_board_diag_fwd
+    test "returns player when a player's piece at loc would win diagonally forward", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {4,4}) == player
+    end
+
+    @tag :setup_board_diag_fwd
+    test "returns nil when a player's piece at loc would not win diagonally forward", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {3,4}) == nil
+    end
+
+    @tag :setup_board_full
+    test "returns :draw when a player's piece at loc would end in a draw", %{board: board, player: player} do
+      assert StatusCheck.check_win_or_draw(board, player, {3,4}) == :draw
+    end
+  end
+
   describe "check_lateral/2" do
     @describetag :setup_board_lat
 
