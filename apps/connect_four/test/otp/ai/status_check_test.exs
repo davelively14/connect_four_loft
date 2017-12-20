@@ -14,13 +14,20 @@ defmodule ConnectFour.StatusCheckTest do
       true -> nil
     end
 
-    game_state = %{board: board} = GameServer.get_state()
+    game_state = %{board: board, avail_cols: avail_cols} = GameServer.get_state()
 
     {player, loc} =
       if game_state.last_play, do: game_state.last_play, else: {nil, nil}
 
-    {:ok, %{game_state: game_state, board: board, player: player, loc: loc}}
+    {:ok, %{game_state: game_state, board: board, player: player, loc: loc, avail_cols: avail_cols}}
   end
+
+  # describe "get_blocks/3" do
+  #   @tag :setup_board_vert
+  #   test "returns correct column required for block", %{board: board, player: player, avail_cols: avail_cols} do
+  #     assert StatusCheck.get_blocks(board, player, avail_cols)
+  #   end
+  # end
 
   describe "check_win_or_draw/3" do
     @tag :setup_board_vert
@@ -127,6 +134,29 @@ defmodule ConnectFour.StatusCheckTest do
 
     test "returns false when a player's piece at loc would not win diagonally back", %{board: board, player: player} do
       refute StatusCheck.check_diag_fwd(board[player], {3,4})
+    end
+  end
+
+  describe "find_open/2" do
+    test "returns correct column on an empty board", %{board: board} do
+      assert StatusCheck.find_open(board[:free], 1) == {1, 1}
+      assert StatusCheck.find_open(board[:free], 3) == {3, 1}
+    end
+
+    @tag :setup_board_vert
+    test "returns correct column with some pieces in place", %{board: board} do
+      assert StatusCheck.find_open(board[:free], 1) == {1, 4}
+      assert StatusCheck.find_open(board[:free], 2) == {2, 3}
+      assert StatusCheck.find_open(board[:free], 3) == {3, 1}
+      assert StatusCheck.find_open(board[:free], 4) == {4, 1}
+      assert StatusCheck.find_open(board[:free], 5) == {5, 1}
+      assert StatusCheck.find_open(board[:free], 6) == {6, 1}
+      assert StatusCheck.find_open(board[:free], 7) == {7, 1}
+    end
+
+    @tag :setup_board_full
+    test "returns nil if no open moves for a column", %{board: board} do
+      assert StatusCheck.find_open(board[:free], 1) == nil
     end
   end
 
