@@ -5,6 +5,8 @@ defmodule ConnectFour.StatusCheck do
 
   @doc """
   Returns a list of columns that would produce a win for the opposing player.
+  Can either pass a valid board, player atom, and available columns list, or
+  simply pass the game_state
 
   ## Examples
 
@@ -12,7 +14,18 @@ defmodule ConnectFour.StatusCheck do
       [1]
       iex> get_block_cols(valid_board, :opposing_player, avail_cols)
       []
+      iex> get_block_cols(valid_game_state)
+      [1]
+      iex> get_block_cols(valid_game_state)
+      []
   """
+  def get_block_cols(game_state) do
+    if last_play = game_state.last_play do
+      get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols, [])
+    else
+      []
+    end
+  end
   def get_block_cols(board, player, avail_cols), do: get_block_cols(board, player, avail_cols, [])
   defp get_block_cols(_, _, [], to_block), do: to_block
   defp get_block_cols(board, player, [head | tail], to_block) do
