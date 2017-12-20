@@ -55,6 +55,24 @@ defmodule ConnectFour.StatusCheckTest do
     end
   end
 
+  describe "get_block_cols/1" do
+    test "returns empty list if new board or no threat to win", %{game_state: game_state} do
+      assert StatusCheck.get_block_cols(game_state) == []
+    end
+
+    @tag :setup_board_vert
+    test "returns correct column required for blocking vertically", %{game_state: game_state} do
+      assert StatusCheck.get_block_cols(game_state) == [1]
+    end
+
+    @tag :setup_board_lat
+    test "returns multiple columns for blocking when multiple ways to win", %{game_state: game_state} do
+      result = StatusCheck.get_block_cols(game_state)
+
+      assert result == [2, 6] || result == [6, 2]
+    end
+  end
+
   describe "check_win_or_draw/3" do
     @tag :setup_board_vert
     test "returns player when a player's piece at loc would win vertically", %{board: board, player: player} do
