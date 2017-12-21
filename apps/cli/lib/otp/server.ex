@@ -1,5 +1,5 @@
 defmodule CLI.Server do
-  alias ConnectFour.GameServer
+  alias ConnectFour.{GameServer, AI}
 
   #######
   # API #
@@ -97,11 +97,11 @@ defmodule CLI.Server do
     end
   end
 
-  def select({:play_game, :easy, state}) do
+  def select({:play_game, difficulty, state}) do
     game_state = GameServer.get_state
     options = prep_options(game_state.avail_cols)
 
-    IO.puts "Available columns: #{Enum.join(game_state.avail_cols, ", ")}"
+    print_board(game_state)
     selection = IO.gets "#{state[game_state.current_player] |> String.trim_trailing}'s turn. Select a column: "
 
     selection = selection |> sanitize_selection
@@ -115,7 +115,22 @@ defmodule CLI.Server do
         case result do
           :ok ->
             IO.puts "Added a piece to column #{selection}"
-            select({:play_game, 2, state})
+            cpu_play = AI.select_column(GameServer.get_state, difficulty)
+
+            case GameServer.drop_piece(cpu_play) do
+              :ok ->
+                IO.puts "CPU adds a piece to column #{cpu_play}"
+                select({:play_game, difficulty, state})
+              {:ok, :draw} ->
+                print_result(:draw)
+                select(:main_menu)
+              {:error, message} ->
+                IO.puts "#{message}\n\n"
+                select({:play_game, difficulty, state})
+              _ ->
+                IO.puts "Unknown error, restarting"
+                select(:main_menu)
+            end
           {:ok, :draw} ->
             print_result(:draw)
             select(:main_menu)
@@ -124,14 +139,14 @@ defmodule CLI.Server do
             select(:main_menu)
           {:error, message} ->
             IO.puts "#{message}\n\n"
-            select({:play_game, 2, state})
+            select({:play_game, difficulty, state})
           _ ->
             IO.puts "Unknown error, restarting"
             select(:main_menu)
         end
       end
     else
-      invalid({:play_game, :easy, state})
+      invalid({:play_game, difficulty, state})
     end
   end
 
