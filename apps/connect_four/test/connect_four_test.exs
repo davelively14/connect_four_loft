@@ -9,12 +9,10 @@ defmodule ConnectFourTest do
       end
 
       assert :erlang.whereis ConnectFour.GameServer == :undefined
-      assert :erlang.whereis ConnectFour.AIServer == :undefined
 
       assert capture_io("Q", start)
 
       assert is_pid :erlang.whereis ConnectFour.GameServer
-      assert is_pid :erlang.whereis ConnectFour.AIServer
     end
 
     test "will set default width and height if non provided" do

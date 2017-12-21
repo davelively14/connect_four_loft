@@ -1,5 +1,5 @@
 defmodule CLI.Server do
-  alias ConnectFour.GameServer
+  alias ConnectFour.{GameServer, AI}
 
   #######
   # API #
@@ -18,6 +18,7 @@ defmodule CLI.Server do
     IO.puts "Main Menu"
     IO.puts "----------"
     IO.puts "1 - Start new game for two human players"
+    IO.puts "2 - Start new game with easy CPU opponent"
     IO.puts "Q - Quit the game at any point"
     IO.puts "----------"
     selection =
@@ -25,7 +26,7 @@ defmodule CLI.Server do
 
     selection = selection |> sanitize_selection
 
-    options = ["1", "Q"]
+    options = ["1", "2", "Q"]
 
     if is_valid?(selection, options) do
       case selection do
@@ -33,6 +34,8 @@ defmodule CLI.Server do
           exit_game()
         "1" ->
           select({:new_game, 2})
+        "2" ->
+          select({:new_game, :easy})
         _ ->
           select(:main_menu)
       end
@@ -49,11 +52,18 @@ defmodule CLI.Server do
     select({:play_game, 2, %{player_1: player_1, player_2: player_2}})
   end
 
+  def select({:new_game, difficulty}) do
+    GameServer.reset_game()
+    player_1 = IO.gets "Enter player's name: "
+    IO.puts "Let's play!\nEnter 'q' at any time to quit the game."
+    select({:play_game, difficulty, %{player_1: player_1, player_2: "CPU"}})
+  end
+
   def select({:play_game, 2, state}) do
     game_state = GameServer.get_state
     options = prep_options(game_state.avail_cols)
 
-    IO.puts "Available columns: #{Enum.join(game_state.avail_cols, ", ")}"
+    print_board(game_state)
     selection = IO.gets "#{state[game_state.current_player] |> String.trim_trailing}'s turn. Select a column: "
 
     selection = selection |> sanitize_selection
@@ -84,6 +94,59 @@ defmodule CLI.Server do
       end
     else
       invalid({:play_game, 2, state})
+    end
+  end
+
+  def select({:play_game, difficulty, state}) do
+    game_state = GameServer.get_state
+    options = prep_options(game_state.avail_cols)
+
+    print_board(game_state)
+    selection = IO.gets "#{state[game_state.current_player] |> String.trim_trailing}'s turn. Select a column: "
+
+    selection = selection |> sanitize_selection
+
+    if is_valid?(selection, options) do
+      if selection == "Q" do
+        exit_game()
+      else
+        result = GameServer.drop_piece(String.to_integer(selection))
+
+        case result do
+          :ok ->
+            IO.puts "Added a piece to column #{selection}"
+            cpu_play = AI.select_column(GameServer.get_state, difficulty)
+
+            case GameServer.drop_piece(cpu_play) do
+              :ok ->
+                IO.puts "CPU adds a piece to column #{cpu_play}"
+                select({:play_game, difficulty, state})
+              {:ok, :draw} ->
+                print_result(:draw)
+                select(:main_menu)
+              {:error, message} ->
+                IO.puts "#{message}\n\n"
+                select({:play_game, difficulty, state})
+              _ ->
+                IO.puts "Unknown error, restarting"
+                select(:main_menu)
+            end
+          {:ok, :draw} ->
+            print_result(:draw)
+            select(:main_menu)
+          {:ok, winner} ->
+            print_result(state[winner])
+            select(:main_menu)
+          {:error, message} ->
+            IO.puts "#{message}\n\n"
+            select({:play_game, difficulty, state})
+          _ ->
+            IO.puts "Unknown error, restarting"
+            select(:main_menu)
+        end
+      end
+    else
+      invalid({:play_game, difficulty, state})
     end
   end
 
@@ -118,4 +181,35 @@ defmodule CLI.Server do
 
   defp print_result(:draw), do: IO.puts "The game has ended in a draw! Try again...\n\n"
   defp print_result(winner), do: IO.puts "Congrats! #{winner |> String.trim_trailing} has won the game!\n\n"
+
+  def print_board(game_state) do
+    for y <- game_state.dimensions.height..1 do
+      IO.puts print_row(game_state.board, y, 1..game_state.dimensions.width |> Enum.to_list)
+    end
+    IO.puts print_lower_border(game_state.dimensions.width)
+    IO.puts print_column_footers(game_state.dimensions.width)
+  end
+
+  defp print_row(board, row, cols), do: print_row(board, row, cols, "| ")
+  defp print_row(_, _, [], result), do: result
+  defp print_row(board, row, [col | tail], result) do
+    cond do
+      MapSet.member?(board.free, {col, row}) ->
+        print_row(board, row, tail, result <> "-  ")
+      MapSet.member?(board.player_1, {col, row}) ->
+        print_row(board, row, tail, result <> "1  ")
+      MapSet.member?(board.player_2, {col, row}) ->
+        print_row(board, row, tail, result <> "2  ")
+      true ->
+        :error
+    end
+  end
+
+  defp print_lower_border(width), do: print_lower_border(1..width |> Enum.to_list, "|-")
+  defp print_lower_border([], result), do: result
+  defp print_lower_border([_ | tail], result), do: print_lower_border(tail, result <> "---")
+
+  defp print_column_footers(width), do: print_column_footers(1..width |> Enum.to_list, "  ")
+  defp print_column_footers([], result), do: result
+  defp print_column_footers([head | tail], result), do: print_column_footers(tail, result <> "#{head}  ")
 end
