@@ -29,7 +29,13 @@ defmodule CLI.ServerTest do
       Server.select({:play_game, 2, %{player_1: "player 1", player_2: "player 2"}})
     end
 
-    {:ok, %{start_fn: start_fn, main_menu: main_menu, new_two_player: new_two_player, new_one_player_easy: new_one_player_easy, game_env: game_env}}
+    print_board = fn () ->
+      Server.print_board(GameServer.get_state())
+    end
+
+    {:ok, %{start_fn: start_fn, main_menu: main_menu, new_two_player: new_two_player,
+            new_one_player_easy: new_one_player_easy, game_env: game_env,
+            print_board: print_board}}
   end
 
   # Note that passing "Q" as the first argument into all of the capture_io
@@ -117,6 +123,23 @@ defmodule CLI.ServerTest do
   describe "print_intro/0" do
     test "prints a greeting" do
       assert capture_io(&Server.print_intro/0) =~ "Welcome to Connect Four!"
+    end
+  end
+
+  describe "print_board/1" do
+    @describetag :start_game_server
+
+    test "prints empty board", %{print_board: print_board} do
+      assert capture_io(print_board) == """
+      | -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n|----------------------
+      """
+    end
+
+    test "prints nearly full board", %{print_board: print_board} do
+      fill_board()
+      assert capture_io(print_board) == """
+      | 2  1  2  2  1  2  -  \n| 1  2  1  1  2  1  1  \n| 2  1  2  2  1  2  2  \n| 1  2  1  1  2  1  1  \n| 2  1  2  2  1  2  2  \n| 1  2  1  1  2  1  1  \n|----------------------
+      """
     end
   end
 
