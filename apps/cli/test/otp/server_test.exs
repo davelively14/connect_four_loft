@@ -130,16 +130,12 @@ defmodule CLI.ServerTest do
     @describetag :start_game_server
 
     test "prints empty board", %{print_board: print_board} do
-      assert capture_io(print_board) == """
-      | -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n|----------------------
-      """
+      assert capture_io(print_board) == "| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n| -  -  -  -  -  -  -  \n|----------------------\n  1  2  3  4  5  6  7  \n"
     end
 
     test "prints nearly full board", %{print_board: print_board} do
       fill_board()
-      assert capture_io(print_board) == """
-      | 2  1  2  2  1  2  -  \n| 1  2  1  1  2  1  1  \n| 2  1  2  2  1  2  2  \n| 1  2  1  1  2  1  1  \n| 2  1  2  2  1  2  2  \n| 1  2  1  1  2  1  1  \n|----------------------
-      """
+      assert capture_io(print_board) == "| 2  1  2  2  1  2  -  \n| 1  2  1  1  2  1  1  \n| 2  1  2  2  1  2  2  \n| 1  2  1  1  2  1  1  \n| 2  1  2  2  1  2  2  \n| 1  2  1  1  2  1  1  \n|----------------------\n  1  2  3  4  5  6  7  \n"
     end
   end
 

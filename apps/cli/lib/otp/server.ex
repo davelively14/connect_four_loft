@@ -63,7 +63,7 @@ defmodule CLI.Server do
     game_state = GameServer.get_state
     options = prep_options(game_state.avail_cols)
 
-    IO.puts "Available columns: #{Enum.join(game_state.avail_cols, ", ")}"
+    print_board(game_state)
     selection = IO.gets "#{state[game_state.current_player] |> String.trim_trailing}'s turn. Select a column: "
 
     selection = selection |> sanitize_selection
@@ -172,6 +172,7 @@ defmodule CLI.Server do
       IO.puts print_row(game_state.board, y, 1..game_state.dimensions.width |> Enum.to_list)
     end
     IO.puts print_lower_border(game_state.dimensions.width)
+    IO.puts print_column_footers(game_state.dimensions.width)
   end
 
   defp print_row(board, row, cols), do: print_row(board, row, cols, "| ")
@@ -192,4 +193,8 @@ defmodule CLI.Server do
   defp print_lower_border(width), do: print_lower_border(1..width |> Enum.to_list, "|-")
   defp print_lower_border([], result), do: result
   defp print_lower_border([_ | tail], result), do: print_lower_border(tail, result <> "---")
+
+  defp print_column_footers(width), do: print_column_footers(1..width |> Enum.to_list, "  ")
+  defp print_column_footers([], result), do: result
+  defp print_column_footers([head | tail], result), do: print_column_footers(tail, result <> "#{head}  ")
 end
