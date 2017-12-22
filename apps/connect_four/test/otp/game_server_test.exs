@@ -22,7 +22,6 @@ defmodule ConnectFour.GameServerTest do
       assert is_integer state.height
       assert is_integer state.width
       assert !state.finished
-      assert is_map state.dimensions
     end
   end
 
@@ -195,6 +194,20 @@ defmodule ConnectFour.GameServerTest do
       assert GameServer.current_player == :player_1
       GameServer.drop_piece(1)
       assert GameServer.current_player == :player_2
+    end
+  end
+
+  describe "new_game/2" do
+    test "creates a new game with height 5 and width 2", %{initial_state: initial_state} do
+      middle_of_game()
+      GameServer.new_game(5, 2)
+
+      new_state = GameServer.get_state()
+
+      refute new_state == initial_state
+      assert new_state.height == 5
+      assert new_state.width == 2
+      assert new_state.board.free |> MapSet.size == 5 * 2
     end
   end
 
