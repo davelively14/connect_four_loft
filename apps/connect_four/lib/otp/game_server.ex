@@ -1,12 +1,15 @@
 defmodule ConnectFour.GameServer do
   use GenServer
 
+  @default_height 6
+  @default_width 7
+
   #######
   # API #
   #######
 
-  def start_link(%{height: height, width: width}) do
-    GenServer.start_link(__MODULE__, [height, width], name: __MODULE__)
+  def start_link() do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def get_state do
@@ -21,6 +24,7 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, :reset_game)
   end
 
+  def new_game, do: new_game(@default_height, @default_width)
   def new_game(height, width) do
     GenServer.call(__MODULE__, {:new_game, height, width})
   end
@@ -33,8 +37,13 @@ defmodule ConnectFour.GameServer do
   # Callbacks #
   #############
 
-  def init([height, width]) do
-    {:ok, reset_state(height, width)}
+  def init(_) do
+    state = %{
+      next_id: 1,
+      games: %{}
+    }
+
+    {:ok, state}
   end
 
   def handle_call(:get_state, _from, state) do
@@ -64,13 +73,18 @@ defmodule ConnectFour.GameServer do
   end
 
   def handle_call(:reset_game, _from, state) do
-    new_state = reset_state(state.height, state.width)
+    new_state = create_new_game(state.height, state.width)
     {:reply, :ok, new_state}
   end
 
-  def handle_call({:new_game, height, width}, _from, _state) do
-    new_state = reset_state(height, width)
-    {:reply, :ok, new_state}
+  def handle_call({:new_game, height, width}, _from, state) do
+    new_game = create_new_game(height, width)
+
+    games =
+      state.games
+      |> Map.put_new(state.next_id, new_game)
+
+    {:reply, {:ok, state.next_id}, Map.put(state, :games, games)}
   end
 
   def handle_call(:current_player, _from, state) do
@@ -81,7 +95,7 @@ defmodule ConnectFour.GameServer do
   # Support Functions #
   #####################
 
-  defp reset_state(height, width) do
+  defp create_new_game(height, width) do
     %{
       board: %{
         free: setup_board(width, height),
