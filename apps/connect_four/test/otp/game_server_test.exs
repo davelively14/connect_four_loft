@@ -65,84 +65,90 @@ defmodule ConnectFour.GameServerTest do
       assert {:error, _} = GameServer.get_game(-1)
     end
   end
-  #
-  # describe "drop_piece/1" do
-  #   test "valid play records move" do
-  #     assert :ok = GameServer.drop_piece(1)
-  #     state = GameServer.get_state()
-  #     refute MapSet.member?(state.board.free, {1,1})
-  #     assert MapSet.member?(state.board.player_1, {1,1})
-  #   end
-  #
-  #   test "valid move alternates player" do
-  #     state = GameServer.get_state()
-  #     assert state.current_player == :player_1
-  #
-  #     GameServer.drop_piece(1)
-  #     state = GameServer.get_state()
-  #     assert state.current_player == :player_2
-  #
-  #     GameServer.drop_piece(1)
-  #     state = GameServer.get_state()
-  #     assert state.current_player == :player_1
-  #   end
-  #
-  #   test "invalid play returns error" do
-  #     for _ <- 1..6, do: GameServer.drop_piece(1)
-  #     initial_state = GameServer.get_state()
-  #     assert {:error, "Column 1 is full. Chose another column."} == GameServer.drop_piece(1)
-  #
-  #     end_state = GameServer.get_state()
-  #     assert initial_state.current_player == end_state.current_player
-  #   end
-  #
-  #   test "returns winner when game is won laterally" do
-  #     assert {:ok, :player_1} == win_game_lateral()
-  #   end
-  #
-  #   test "returns winner when game is won vertically" do
-  #     assert {:ok, :player_1} == win_game_vertical()
-  #   end
-  #
-  #   test "returns winner when game is won diagonally - blackslash" do
-  #     assert {:ok, :player_1} == win_game_diag_back()
-  #   end
-  #
-  #   test "returns winner when game is won diagonally - forwardslash" do
-  #     assert {:ok, :player_1} == win_game_diag_fwd()
-  #   end
-  #
-  #   test "further attempts to play will result in error when game is already won" do
-  #     win_game_lateral()
-  #     assert {:error, "player_1 already won the game."} == GameServer.drop_piece(2)
-  #   end
-  #
-  #   test "reports when draw occurs" do
-  #     assert {:ok, :draw} == fill_board()
-  #   end
-  #
-  #   test "further attempts to play will result in error when game is already in draw" do
-  #     fill_board()
-  #     assert {:error, "The game ended in a draw."} == GameServer.drop_piece(1)
-  #   end
-  #
-  #   test "filling a row will result in dropping that row from avail_cols" do
-  #     GameServer.drop_piece(1)
-  #     GameServer.drop_piece(1)
-  #     GameServer.drop_piece(1)
-  #     GameServer.drop_piece(1)
-  #     GameServer.drop_piece(1)
-  #     assert GameServer.get_state |> Map.get(:avail_cols) == [1,2,3,4,5,6,7]
-  #     GameServer.drop_piece(1)
-  #     assert GameServer.get_state |> Map.get(:avail_cols) == [2,3,4,5,6,7]
-  #   end
-  #
-  #   test "records last play" do
-  #     assert GameServer.get_state |> Map.get(:last_play) == nil
-  #     GameServer.drop_piece(1)
-  #     assert GameServer.get_state |> Map.get(:last_play) == {:player_1, {1,1}}
-  #   end
-  # end
+
+  describe "drop_piece/1" do
+    @describetag :start_new_game
+
+    test "valid play records move", %{game_id: game_id} do
+      assert :ok = GameServer.drop_piece(game_id, 1)
+      game = GameServer.get_game(game_id)
+      refute MapSet.member?(game.board.free, {1,1})
+      assert MapSet.member?(game.board.player_1, {1,1})
+    end
+
+    test "invalid game_id results in error" do
+      assert {:error, _} = GameServer.drop_piece(-1, 1)
+    end
+
+    test "valid move alternates player", %{game_id: game_id} do
+      game = GameServer.get_game(game_id)
+      assert game.current_player == :player_1
+
+      GameServer.drop_piece(game_id, 1)
+      game = GameServer.get_game(game_id)
+      assert game.current_player == :player_2
+
+      GameServer.drop_piece(game_id, 1)
+      game = GameServer.get_game(game_id)
+      assert game.current_player == :player_1
+    end
+
+    test "invalid play returns error", %{game_id: game_id} do
+      for _ <- 1..6, do: GameServer.drop_piece(game_id, 1)
+      initial_game_state = GameServer.get_game(game_id)
+      assert {:error, "Column 1 is full. Chose another column."} == GameServer.drop_piece(game_id, 1)
+
+      end_game_state = GameServer.get_game(game_id)
+      assert initial_game_state.current_player == end_game_state.current_player
+    end
+
+    test "returns winner when game is won laterally", %{game_id: game_id} do
+      assert {:ok, :player_1} == win_game_lateral(game_id)
+    end
+
+    test "returns winner when game is won vertically", %{game_id: game_id} do
+      assert {:ok, :player_1} == win_game_vertical(game_id)
+    end
+
+    test "returns winner when game is won diagonally - blackslash", %{game_id: game_id} do
+      assert {:ok, :player_1} == win_game_diag_back(game_id)
+    end
+
+    test "returns winner when game is won diagonally - forwardslash", %{game_id: game_id} do
+      assert {:ok, :player_1} == win_game_diag_fwd(game_id)
+    end
+
+    test "further attempts to play will result in error when game is already won", %{game_id: game_id} do
+      win_game_lateral(game_id)
+      assert {:error, "player_1 already won the game."} == GameServer.drop_piece(game_id, 2)
+    end
+
+    test "reports when draw occurs", %{game_id: game_id} do
+      assert {:ok, :draw} == fill_board(game_id)
+    end
+
+    test "further attempts to play will result in error when game is already in draw", %{game_id: game_id} do
+      fill_board(game_id)
+      assert {:error, "The game ended in a draw."} == GameServer.drop_piece(game_id, 1)
+    end
+
+    test "filling a row will result in dropping that row from avail_cols", %{game_id: game_id} do
+      GameServer.drop_piece(game_id, 1)
+      GameServer.drop_piece(game_id, 1)
+      GameServer.drop_piece(game_id, 1)
+      GameServer.drop_piece(game_id, 1)
+      GameServer.drop_piece(game_id, 1)
+      assert GameServer.get_game(game_id) |> Map.get(:avail_cols) == [1,2,3,4,5,6,7]
+      GameServer.drop_piece(game_id, 1)
+      assert GameServer.get_game(game_id) |> Map.get(:avail_cols) == [2,3,4,5,6,7]
+    end
+
+    test "records last play", %{game_id: game_id} do
+      assert GameServer.get_game(game_id) |> Map.get(:last_play) == nil
+      GameServer.drop_piece(game_id, 1)
+      assert GameServer.get_game(game_id) |> Map.get(:last_play) == {:player_1, {1,1}}
+    end
+  end
 
   describe "check_lateral/2" do
     test "returns true if win laterally" do
@@ -256,70 +262,70 @@ defmodule ConnectFour.GameServerTest do
   # Private Functions #
   #####################
 
-  defp fill_board do
+  defp fill_board(game_id) do
     for outer <- 0..1 do
       for x <- 1..3 do
         for _ <- 0..4 do
-          GameServer.drop_piece(x + outer * 3)
+          GameServer.drop_piece(game_id, x + outer * 3)
         end
       end
       for x <- 1..3 do
-        GameServer.drop_piece(x + outer * 3)
+        GameServer.drop_piece(game_id, x + outer * 3)
       end
     end
     for _ <- 1..6 do
-      GameServer.drop_piece(7)
+      GameServer.drop_piece(game_id, 7)
     end
     |> List.flatten()
     |> List.last()
   end
 
-  defp win_game_vertical do
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(1)
+  defp win_game_vertical(game_id) do
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 1)
   end
 
-  defp win_game_lateral do
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(4)
+  defp win_game_lateral(game_id) do
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 4)
   end
 
-  defp win_game_diag_back do
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(4)
+  defp win_game_diag_back(game_id) do
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 4)
   end
 
-  defp win_game_diag_fwd do
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(1)
+  defp win_game_diag_fwd(game_id) do
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 1)
   end
 
   defp middle_of_game do
