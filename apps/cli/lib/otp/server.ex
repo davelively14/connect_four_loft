@@ -183,11 +183,11 @@ defmodule CLI.Server do
   defp print_result(winner), do: IO.puts "Congrats! #{winner |> String.trim_trailing} has won the game!\n\n"
 
   def print_board(game_state) do
-    for y <- game_state.dimensions.height..1 do
-      IO.puts print_row(game_state.board, y, 1..game_state.dimensions.width |> Enum.to_list)
+    for y <- game_state.height..1 do
+      IO.puts print_row(game_state.board, y, 1..game_state.width |> Enum.to_list)
     end
-    IO.puts print_lower_border(game_state.dimensions.width)
-    IO.puts print_column_footers(game_state.dimensions.width)
+    IO.puts print_lower_border(game_state.width)
+    IO.puts print_column_footers(game_state.width)
   end
 
   defp print_row(board, row, cols), do: print_row(board, row, cols, "| ")
