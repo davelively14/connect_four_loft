@@ -29,6 +29,10 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, {:new_game, height, width})
   end
 
+  def get_game(game_id) do
+    GenServer.call(__MODULE__, {:get_game, game_id})
+  end
+
   def current_player do
     GenServer.call(__MODULE__, :current_player)
   end
@@ -86,6 +90,17 @@ defmodule ConnectFour.GameServer do
     :ets.insert(state.ets, {state.next_id, new_game})
 
     {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
+  end
+
+  def handle_call({:get_game, game_id}, _from, state) do
+    case :ets.lookup(state.ets, game_id) do
+      [] ->
+        {:reply, {:error, "Game does not exist"}, state}
+      [{_, game}] ->
+        {:reply, game, state}
+      _ ->
+        {:reply, {:error, "Unknown"}, state}
+    end
   end
 
   def handle_call(:current_player, _from, state) do
