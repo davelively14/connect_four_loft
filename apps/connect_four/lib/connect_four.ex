@@ -1,6 +1,7 @@
 defmodule ConnectFour do
   use Application
 
+  def start, do: start(nil, %{height: 6, width: 7})
   def start(_type, %{height: height, width: width} \\ %{height: 6, width: 7}) do
     import Supervisor.Spec
 
