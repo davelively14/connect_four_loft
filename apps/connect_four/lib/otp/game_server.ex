@@ -84,8 +84,7 @@ defmodule ConnectFour.GameServer do
       last_play: nil,
       avail_cols: 1..width |> Enum.to_list,
       current_player: :player_1,
-      finished: nil,
-      dimensions: %{height: height, width: width}
+      finished: nil
     }
   end
 
