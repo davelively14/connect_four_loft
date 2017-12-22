@@ -143,55 +143,55 @@ defmodule ConnectFour.GameServerTest do
   #     assert GameServer.get_state |> Map.get(:last_play) == {:player_1, {1,1}}
   #   end
   # end
-  #
-  # describe "check_lateral/2" do
-  #   test "returns true if win laterally" do
-  #     loc = {3,1}
-  #     assert GameServer.check_lateral(win_lateral_board(loc), loc)
-  #   end
-  #
-  #   test "returns false if no win laterally" do
-  #     loc = {3,1}
-  #     refute GameServer.check_lateral(no_win_lateral_board(loc), loc)
-  #   end
-  # end
-  #
-  # describe "check_vertical/2" do
-  #   test "returns true if win vertically" do
-  #     loc = {1,4}
-  #     assert GameServer.check_vertical(win_vertical_board(loc), loc)
-  #   end
-  #
-  #   test "returns false if no win vertically" do
-  #     loc = {1,3}
-  #     refute GameServer.check_vertical(no_win_vertical_board(loc), loc)
-  #   end
-  # end
-  #
-  # describe "check_diag_back/2" do
-  #   test "returns true if win backslash diagonally" do
-  #     loc = {3,3}
-  #     assert GameServer.check_diag_back(win_diag_back_board(loc), loc)
-  #   end
-  #
-  #   test "returns false if no win backslash diagonally" do
-  #     loc = {3,3}
-  #     refute GameServer.check_diag_back(no_win_diag_back_board(loc), loc)
-  #   end
-  # end
-  #
-  # describe "check_diag_fwd/2" do
-  #   test "returns true if win forwardslash diagonally" do
-  #     loc = {3,3}
-  #     assert GameServer.check_diag_fwd(win_diag_fwd_board(loc), loc)
-  #   end
-  #
-  #   test "returns false if no win forwardslash diagonally" do
-  #     loc = {3,3}
-  #     refute GameServer.check_diag_fwd(no_win_diag_fwd_board(loc), loc)
-  #   end
-  # end
-  #
+
+  describe "check_lateral/2" do
+    test "returns true if win laterally" do
+      loc = {3,1}
+      assert GameServer.check_lateral(win_lateral_board(loc), loc)
+    end
+
+    test "returns false if no win laterally" do
+      loc = {3,1}
+      refute GameServer.check_lateral(no_win_lateral_board(loc), loc)
+    end
+  end
+
+  describe "check_vertical/2" do
+    test "returns true if win vertically" do
+      loc = {1,4}
+      assert GameServer.check_vertical(win_vertical_board(loc), loc)
+    end
+
+    test "returns false if no win vertically" do
+      loc = {1,3}
+      refute GameServer.check_vertical(no_win_vertical_board(loc), loc)
+    end
+  end
+
+  describe "check_diag_back/2" do
+    test "returns true if win backslash diagonally" do
+      loc = {3,3}
+      assert GameServer.check_diag_back(win_diag_back_board(loc), loc)
+    end
+
+    test "returns false if no win backslash diagonally" do
+      loc = {3,3}
+      refute GameServer.check_diag_back(no_win_diag_back_board(loc), loc)
+    end
+  end
+
+  describe "check_diag_fwd/2" do
+    test "returns true if win forwardslash diagonally" do
+      loc = {3,3}
+      assert GameServer.check_diag_fwd(win_diag_fwd_board(loc), loc)
+    end
+
+    test "returns false if no win forwardslash diagonally" do
+      loc = {3,3}
+      refute GameServer.check_diag_fwd(no_win_diag_fwd_board(loc), loc)
+    end
+  end
+
   # describe "reset_game/0" do
   #   test "resets a game to original parameters with game in progress", %{initial_state: initial_state} do
   #     middle_of_game()
