@@ -19,8 +19,9 @@ defmodule ConnectFourBackendWeb.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", ConnectFourBackendWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", ConnectFourBackendWeb do
+    pipe_through :api
+
+    
+  end
 end
