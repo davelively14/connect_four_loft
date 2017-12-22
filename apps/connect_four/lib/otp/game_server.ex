@@ -38,12 +38,15 @@ defmodule ConnectFour.GameServer do
   #############
 
   def init(_) do
-    state = %{
-      next_id: 1,
-      games: %{}
-    }
+    ets =
+      if :ets.info(:games) == :undefined do
+        :ets.new(:games, [:set, :private, :named_table])
+      else
+        :ets.delete(:games)
+        :ets.new(:games, [:set, :private, :named_table])
+      end
 
-    {:ok, state}
+    {:ok, %{next_id: 1, ets: ets}}
   end
 
   def handle_call(:get_state, _from, state) do
@@ -80,11 +83,9 @@ defmodule ConnectFour.GameServer do
   def handle_call({:new_game, height, width}, _from, state) do
     new_game = create_new_game(height, width)
 
-    games =
-      state.games
-      |> Map.put_new(state.next_id, new_game)
+    :ets.insert(state.ets, {state.next_id, new_game})
 
-    {:reply, {:ok, state.next_id}, Map.put(state, :games, games)}
+    {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
   end
 
   def handle_call(:current_player, _from, state) do
