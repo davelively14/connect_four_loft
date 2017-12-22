@@ -13,6 +13,7 @@ defmodule ConnectFourBackendWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # TODO: remove
   scope "/", ConnectFourBackendWeb do
     pipe_through :browser # Use the default browser stack
 
@@ -22,6 +23,6 @@ defmodule ConnectFourBackendWeb.Router do
   scope "/api", ConnectFourBackendWeb do
     pipe_through :api
 
-    
+    resources "/game", GameController, only: [:create]
   end
 end
