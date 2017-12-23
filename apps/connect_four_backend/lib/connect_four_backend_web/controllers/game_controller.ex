@@ -6,7 +6,7 @@ defmodule ConnectFourBackendWeb.GameController do
     height = ensure_int(height)
     width = ensure_int(width)
 
-    if :erlang.whereis(ConnectFor) == :undefined do
+    if :erlang.whereis(ConnectFour) == :undefined do
       ConnectFour.start()
     end
 
