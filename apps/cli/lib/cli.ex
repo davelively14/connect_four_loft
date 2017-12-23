@@ -8,7 +8,7 @@ defmodule CLI do
     import Supervisor.Spec
 
     children = [
-      worker(ConnectFour.GameServer, [%{height: @height, width: @width}], [])
+      worker(ConnectFour.GameServer, [], [])
     ]
 
     options = [
