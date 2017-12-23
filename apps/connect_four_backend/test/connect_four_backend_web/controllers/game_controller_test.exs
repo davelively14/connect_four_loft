@@ -22,17 +22,17 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
 
     test "with incorrect parameters, will start a game with default parameters", %{conn: conn} do
       conn = post conn, game_path(conn, :create), height: "hello", width: "world"
-      assert %{"errors" => "Invalid parameters"} == json_response(conn, 422)
+      assert %{"error" => "Invalid parameters"} == json_response(conn, 422)
     end
 
     test "with negative height, will start a game with default parameters", %{conn: conn} do
       conn = post conn, game_path(conn, :create), height: "-4", width: "5"
-      assert %{"errors" => "Invalid parameters"} == json_response(conn, 422)
+      assert %{"error" => "Invalid parameters"} == json_response(conn, 422)
     end
 
     test "with negative width, will start a game with default parameters", %{conn: conn} do
       conn = post conn, game_path(conn, :create), height: "4", width: "-5"
-      assert %{"errors" => "Invalid parameters"} == json_response(conn, 422)
+      assert %{"error" => "Invalid parameters"} == json_response(conn, 422)
     end
   end
 end
