@@ -33,8 +33,8 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, {:get_game, game_id})
   end
 
-  def current_player do
-    GenServer.call(__MODULE__, :current_player)
+  def current_player(game_id) do
+    GenServer.call(__MODULE__, {:current_player, game_id})
   end
 
   #############
@@ -108,8 +108,15 @@ defmodule ConnectFour.GameServer do
     {:reply, fetch_game_from_ets(state.ets, game_id), state}
   end
 
-  def handle_call(:current_player, _from, state) do
-    {:reply, state.current_player, state}
+  def handle_call({:current_player, game_id}, _from, state) do
+    game = fetch_game_from_ets(state.ets, game_id)
+
+    cond do
+      is_tuple(game) ->
+        {:reply, game, state}
+      true ->
+        {:reply, game.current_player, state}
+    end
   end
 
   #####################
