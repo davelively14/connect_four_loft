@@ -1,5 +1,6 @@
 defmodule ConnectFourBackendWeb.GameControllerTest do
   use ConnectFourBackendWeb.ConnCase
+  alias ConnectFour.GameServer
 
   describe "POST create" do
     test "with no parameters, starts a new game with default dimensions", %{conn: conn} do
@@ -60,14 +61,73 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     end
   end
 
+  describe "PUT update" do
+    setup :game_started
+
+    test "with valid game_id and column, returns an updated game state", %{conn: conn, game_id: game_id} do
+      conn = put conn, game_path(conn, :update, game_id), col: 1
+      assert resp = json_response(conn, 200)
+
+      assert resp["id"] == game_id
+      assert resp["last_play"] == ["player_1", [1, 1]]
+    end
+
+    test "handles win condition", %{conn: conn, game_id: game_id} do
+      setup_win(game_id)
+      conn = put conn, game_path(conn, :update, game_id), col: 1
+      assert resp = json_response(conn, 200)
+
+      assert resp["finished"]
+    end
+
+    test "handles attempts when game is already over", %{conn: conn, game_id: game_id} do
+      game_won(game_id)
+      conn = put conn, game_path(conn, :update, game_id), col: 1
+      assert %{"error" => "player_1 already won the game."} == json_response(conn, 422)
+    end
+
+    test "with invalid game_id, returns error", %{conn: conn} do
+      conn = put conn, game_path(conn, :update, 9999), col: 1
+      assert %{"error" => "Game does not exist"} == json_response(conn, 422)
+    end
+
+    test "with invalid column integer, returns error", %{conn: conn, game_id: game_id} do
+      conn = put conn, game_path(conn, :update, game_id), col: 13
+      assert %{"error" => "Invalid column"} == json_response(conn, 422)
+    end
+
+    test "with invalid column format, returns error", %{conn: conn, game_id: game_id} do
+      conn = put conn, game_path(conn, :update, game_id), col: "hello"
+      assert %{"error" => "Invalid parameters"} == json_response(conn, 422)
+    end
+  end
+
   ###################
   # Setup Functions #
   ###################
 
   defp game_started(_context) do
-    ConnectFour.GameServer.start_link()
-    {:ok, game_id} = ConnectFour.GameServer.new_game()
+    GameServer.start_link()
+    {:ok, game_id} = GameServer.new_game()
 
     {:ok, game_id: game_id}
+  end
+
+  #####################
+  # Private Functions #
+  #####################
+
+  defp setup_win(game_id) do
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+  end
+
+  defp game_won(game_id) do
+    setup_win(game_id)
+    GameServer.drop_piece(game_id, 1)
   end
 end

@@ -31,6 +31,23 @@ defmodule ConnectFourBackendWeb.GameController do
     end
   end
 
+  def update(conn, %{"id" => game_id, "col" => col}) do
+    game_id = ensure_positive_int(game_id)
+    col = ensure_positive_int(col)
+
+    if game_id && col do
+      case GameServer.drop_piece(game_id, col) do
+        {:error, reason} ->
+          render_error(conn, 422, reason)
+        _ ->
+          game_state = GameServer.get_game(game_id)
+          render conn, "state.json", %{game_state: game_state, game_id: game_id}
+      end
+    else
+      render_error(conn, 422, "Invalid parameters")
+    end
+  end
+
   #####################
   # Private Functions #
   #####################
