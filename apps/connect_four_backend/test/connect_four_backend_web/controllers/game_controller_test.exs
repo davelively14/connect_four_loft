@@ -11,13 +11,19 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
       assert state["board"]["free"] |> length == 6 * 7
     end
 
-    test "with paramters, will start a new game with specified dimensions", %{conn: conn} do
+    test "with parameters, will start a new game with specified dimensions", %{conn: conn} do
       conn = post conn, game_path(conn, :create), height: 2, width: 10
       assert state = json_response(conn, 200)
 
       assert state["height"] == 2
       assert state["width"] == 10
       assert state["board"]["free"] |> length == 2 * 10
+    end
+
+    @tag :current
+    test "with incorrect parameters, will produce error", %{conn: conn} do
+      conn = post conn, game_path(conn, :create), height: "hello", width: "world"
+      assert state = json_response(conn, 200)
     end
   end
 end
