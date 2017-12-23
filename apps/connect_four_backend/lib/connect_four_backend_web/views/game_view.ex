@@ -1,8 +1,9 @@
 defmodule ConnectFourBackendWeb.GameView do
   use ConnectFourBackendWeb, :view
 
-  def render("state.json", game_state) do
+  def render("state.json", %{game_state: game_state, game_id: game_id}) do
     %{
+      id: game_id,
       board: %{
         free: board_to_array(game_state.board.free),
         player_1: board_to_array(game_state.board.player_1),
