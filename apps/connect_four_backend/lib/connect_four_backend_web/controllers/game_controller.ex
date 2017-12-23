@@ -10,7 +10,12 @@ defmodule ConnectFourBackendWeb.GameController do
       ConnectFour.start()
     end
 
-    {:ok, game_id} = GameServer.new_game(height, width)
+    {:ok, game_id} =
+      if height && width do
+        GameServer.new_game(height, width)
+      else
+        GameServer.new_game
+      end
 
     game_state = GameServer.get_game(game_id)
     render conn, "state.json", %{game_state: game_state, game_id: game_id}
@@ -21,7 +26,13 @@ defmodule ConnectFourBackendWeb.GameController do
   # Private Functions #
   #####################
 
+  defp ensure_int(value) when is_integer(value), do: value
   defp ensure_int(value) do
-    if is_bitstring(value), do: String.to_integer(value), else: value
+    case Integer.parse(value) do
+      {num, ""} ->
+        num
+      _ ->
+        nil
+    end
   end
 end
