@@ -27,4 +27,10 @@ defmodule ConnectFourBackendWeb.GameViewTest do
       refute state.last_play
     end
   end
+
+  describe "error.json" do
+    test "renders appropriate message" do
+      assert %{error: "An error"} == GameView.render("error.json", %{error: "An error"})
+    end
+  end
 end

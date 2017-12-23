@@ -18,6 +18,10 @@ defmodule ConnectFourBackendWeb.GameView do
     }
   end
 
+  def render("error.json", %{error: error}) do
+    %{error: error}
+  end
+
   def board_to_array(board) do
     board
     |> MapSet.to_list
