@@ -3,23 +3,24 @@ defmodule ConnectFour.StatusCheckTest do
   alias ConnectFour.{GameServer, StatusCheck}
 
   setup context do
-    GameServer.start_link(%{height: 6, width: 7})
+    GameServer.start_link()
+    {:ok, game_id} = GameServer.new_game()
 
     cond do
-      context[:setup_board_vert] -> setup_board_vert()
-      context[:setup_board_lat] -> setup_board_lat()
-      context[:setup_board_diag_back] -> setup_board_diag_back()
-      context[:setup_board_diag_fwd] -> setup_board_diag_fwd()
-      context[:setup_board_full] -> setup_board_full()
+      context[:setup_board_vert] -> setup_board_vert(game_id)
+      context[:setup_board_lat] -> setup_board_lat(game_id)
+      context[:setup_board_diag_back] -> setup_board_diag_back(game_id)
+      context[:setup_board_diag_fwd] -> setup_board_diag_fwd(game_id)
+      context[:setup_board_full] -> setup_board_full(game_id)
       true -> nil
     end
 
-    game_state = %{board: board, avail_cols: avail_cols} = GameServer.get_state()
+    game_state = %{board: board, avail_cols: avail_cols} = GameServer.get_game(game_id)
 
     {player, loc} =
       if game_state.last_play, do: game_state.last_play, else: {:player_1, nil}
 
-    {:ok, %{game_state: game_state, board: board, player: player, loc: loc, avail_cols: avail_cols}}
+    {:ok, %{game_state: game_state, board: board, player: player, loc: loc, avail_cols: avail_cols, game_id: game_id}}
   end
 
   describe "get_block_cols/3" do
@@ -208,65 +209,63 @@ defmodule ConnectFour.StatusCheckTest do
   # Private Functions #
   #####################
 
-  defp setup_board_vert do
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(1)
+  defp setup_board_vert(game_id) do
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 1)
   end
 
-  defp setup_board_lat do
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(5)
+  defp setup_board_lat(game_id) do
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 5)
   end
 
-  defp setup_board_diag_back do
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(7)
-    GameServer.drop_piece(3)
+  defp setup_board_diag_back(game_id) do
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 7)
+    GameServer.drop_piece(game_id, 3)
   end
 
-  defp setup_board_diag_fwd do
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(4)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(1)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(3)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(2)
-    GameServer.drop_piece(7)
-    GameServer.drop_piece(2)
+  defp setup_board_diag_fwd(game_id) do
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 2)
+    GameServer.drop_piece(game_id, 7)
+    GameServer.drop_piece(game_id, 2)
   end
 
-  defp setup_board_full do
+  defp setup_board_full(game_id) do
     for outer <- 0..1 do
       for x <- 1..3 do
         for _ <- 0..4 do
-          GameServer.drop_piece(x + outer * 3)
+          GameServer.drop_piece(game_id, x + outer * 3)
         end
       end
       for x <- 1..3 do
-        GameServer.drop_piece(x + outer * 3)
+        GameServer.drop_piece(game_id, x + outer * 3)
       end
     end
     for _ <- 1..6 do
-      GameServer.drop_piece(7)
+      GameServer.drop_piece(game_id, 7)
     end
-    |> List.flatten()
-    |> List.last()
   end
 end
