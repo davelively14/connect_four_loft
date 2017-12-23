@@ -244,15 +244,20 @@ defmodule ConnectFour.GameServerTest do
       assert reset_state == initial_state
     end
   end
-  #
-  # describe "current_player/0" do
-  #   test "returns the current player" do
-  #     assert GameServer.current_player == :player_1
-  #     GameServer.drop_piece(1)
-  #     assert GameServer.current_player == :player_2
-  #   end
-  # end
-  #
+
+  describe "current_player/1" do
+    @tag :start_new_game
+    test "returns the current player", %{game_id: game_id} do
+      assert GameServer.current_player(game_id) == :player_1
+      GameServer.drop_piece(game_id, 1)
+      assert GameServer.current_player(game_id) == :player_2
+    end
+
+    test "invalid game_id results in error" do
+      assert {:error, _} = GameServer.current_player(-1)
+    end
+  end
+
   # describe "new_game/2" do
   #   test "creates a new game with height 5 and width 2", %{initial_state: initial_state} do
   #     middle_of_game()
