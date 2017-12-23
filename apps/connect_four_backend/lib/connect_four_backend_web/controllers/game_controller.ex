@@ -6,14 +6,14 @@ defmodule ConnectFourBackendWeb.GameController do
     height = ensure_int(height)
     width = ensure_int(width)
 
-    if :erlang.whereis(ConnectFour) == :undefined do
-      ConnectFour.start(nil, %{height: height, width: width})
-    else
-      GameServer.new_game(height, width)
+    if :erlang.whereis(ConnectFor) == :undefined do
+      ConnectFour.start()
     end
 
-    game_state = GameServer.get_state()
-    render conn, "state.json", game_state
+    {:ok, game_id} = GameServer.new_game(height, width)
+
+    game_state = GameServer.get_game(game_id)
+    render conn, "state.json", %{game_state: game_state, game_id: game_id}
   end
   def create(conn, _), do: create(conn, %{"width" => 7, "height" => 6})
 

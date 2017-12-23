@@ -4,13 +4,14 @@ defmodule ConnectFourBackendWeb.GameViewTest do
   alias ConnectFourBackendWeb.GameView
 
   setup do
-    GameServer.start_link(%{height: 6, width: 7})
-    :ok
+    GameServer.start_link()
+    {:ok, game_id} = GameServer.new_game()
+    {:ok, game_id: game_id}
   end
 
   describe "state.json" do
-    test "renders an appropriate state" do
-      assert state = GameView.render("state.json", GameServer.get_state())
+    test "renders an appropriate state", %{game_id: game_id} do
+      assert state = GameView.render("state.json", %{game_state: GameServer.get_game(game_id), game_id: game_id})
 
       assert state.height == 6
       assert state.width == 7

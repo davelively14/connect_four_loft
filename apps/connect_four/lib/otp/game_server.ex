@@ -1,87 +1,147 @@
 defmodule ConnectFour.GameServer do
   use GenServer
 
+  @default_height 6
+  @default_width 7
+
   #######
   # API #
   #######
 
-  def start_link(%{height: height, width: width}) do
-    GenServer.start_link(__MODULE__, [height, width], name: __MODULE__)
+  def start_link() do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def get_state do
     GenServer.call(__MODULE__, :get_state)
   end
 
-  def drop_piece(col) do
-    GenServer.call(__MODULE__, {:drop_piece, col})
+  def drop_piece(game_id, col) do
+    GenServer.call(__MODULE__, {:drop_piece, game_id, col})
   end
 
-  def reset_game do
-    GenServer.call(__MODULE__, :reset_game)
+  def reset_game(game_id) do
+    GenServer.call(__MODULE__, {:reset_game, game_id})
   end
 
+  def new_game, do: new_game(@default_height, @default_width)
   def new_game(height, width) do
     GenServer.call(__MODULE__, {:new_game, height, width})
   end
+  def new_game(game_id), do: new_game(game_id, @default_height, @default_width)
+  def new_game(game_id, height, width) do
+    GenServer.call(__MODULE__, {:new_game, game_id, height, width})
+  end
 
-  def current_player do
-    GenServer.call(__MODULE__, :current_player)
+  def get_game(game_id) do
+    GenServer.call(__MODULE__, {:get_game, game_id})
+  end
+
+  def current_player(game_id) do
+    GenServer.call(__MODULE__, {:current_player, game_id})
   end
 
   #############
   # Callbacks #
   #############
 
-  def init([height, width]) do
-    {:ok, reset_state(height, width)}
+  def init(_) do
+    ets =
+      if :ets.info(:games) == :undefined do
+        :ets.new(:games, [:set, :private, :named_table])
+      else
+        :ets.delete(:games)
+        :ets.new(:games, [:set, :private, :named_table])
+      end
+
+    {:ok, %{next_id: 1, ets: ets}}
   end
 
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
 
-  def handle_call({:drop_piece, col}, _from, state = %{finished: nil}) do
-    if open_spot = find_open(state.board.free, state.height, col) do
-      new_state =
-        make_move(open_spot, state)
-        |> Map.merge(%{current_player: advance_player(state.current_player)})
-      if !new_state.finished do
-        {:reply, :ok, new_state}
-      else
-        {:reply, {:ok, new_state.finished}, new_state}
-      end
-    else
-      {:reply, {:error, "Column #{col} is full. Chose another column."}, state}
-    end
-  end
+  def handle_call({:drop_piece, game_id, col}, _from, state) do
+    game = fetch_game_from_ets(state.ets, game_id)
 
-  def handle_call({:drop_piece, _col}, _from, state = %{finished: finished}) do
     cond do
-      finished == :draw -> {:reply, {:error, "The game ended in a draw."}, state}
-      true -> {:reply, {:error, "#{state.finished} already won the game."}, state}
+      is_tuple(game) ->
+        {:reply, game, state}
+      game.finished == :draw ->
+        {:reply, {:error, "The game ended in a draw."}, state}
+      game.finished ->
+        {:reply, {:error, "#{game.finished} already won the game."}, state}
+      open_spot = find_open(game.board.free, game.height, col) ->
+        new_game_state =
+          make_move(open_spot, game)
+          |> Map.merge(%{current_player: advance_player(game.current_player)})
+
+        :ets.insert(state.ets, {game_id, new_game_state})
+
+        if !new_game_state.finished do
+          {:reply, :ok, state}
+        else
+          {:reply, {:ok, new_game_state.finished}, state}
+        end
+      true ->
+        {:reply, {:error, "Column #{col} is full. Chose another column."}, state}
     end
   end
 
-  def handle_call(:reset_game, _from, state) do
-    new_state = reset_state(state.height, state.width)
-    {:reply, :ok, new_state}
+  def handle_call({:reset_game, game_id}, _from, state) do
+    game = fetch_game_from_ets(state.ets, game_id)
+
+    cond do
+      is_tuple(game) ->
+        {:reply, game, state}
+      true ->
+        :ets.insert(state.ets, {game_id, create_new_game(game.height, game.width)})
+        {:reply, :ok, state}
+    end
   end
 
-  def handle_call({:new_game, height, width}, _from, _state) do
-    new_state = reset_state(height, width)
-    {:reply, :ok, new_state}
+  def handle_call({:new_game, height, width}, _from, state) do
+    new_game = create_new_game(height, width)
+
+    :ets.insert(state.ets, {state.next_id, new_game})
+
+    {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
   end
 
-  def handle_call(:current_player, _from, state) do
-    {:reply, state.current_player, state}
+  def handle_call({:new_game, game_id, height, width}, _from, state) do
+    new_game = create_new_game(height, width)
+
+    resp = fetch_game_from_ets(state.ets, game_id)
+
+    cond do
+      is_tuple(resp) ->
+        {:reply, resp, state}
+      true ->
+        :ets.insert(state.ets, {game_id, new_game})
+        {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
+    end
+  end
+
+  def handle_call({:get_game, game_id}, _from, state) do
+    {:reply, fetch_game_from_ets(state.ets, game_id), state}
+  end
+
+  def handle_call({:current_player, game_id}, _from, state) do
+    game = fetch_game_from_ets(state.ets, game_id)
+
+    cond do
+      is_tuple(game) ->
+        {:reply, game, state}
+      true ->
+        {:reply, game.current_player, state}
+    end
   end
 
   #####################
   # Support Functions #
   #####################
 
-  defp reset_state(height, width) do
+  defp create_new_game(height, width) do
     %{
       board: %{
         free: setup_board(width, height),
@@ -95,6 +155,17 @@ defmodule ConnectFour.GameServer do
       current_player: :player_1,
       finished: nil
     }
+  end
+
+  defp fetch_game_from_ets(ets, game_id) do
+    case :ets.lookup(ets, game_id) do
+      [] ->
+        {:error, "Game does not exist"}
+      [{_, game}] ->
+        game
+      _ ->
+        {:error, "Unknown"}
+    end
   end
 
   defp setup_board(width, height) do

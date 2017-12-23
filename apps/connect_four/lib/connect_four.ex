@@ -1,12 +1,12 @@
 defmodule ConnectFour do
   use Application
 
-  def start, do: start(nil, %{height: 6, width: 7})
-  def start(_type, %{height: height, width: width} \\ %{height: 6, width: 7}) do
+  def start, do: start(nil, nil)
+  def start(_, _) do
     import Supervisor.Spec
 
     children = [
-      worker(ConnectFour.GameServer, [%{height: height, width: width}], [])
+      worker(ConnectFour.GameServer, [])
     ]
 
     opts = [
