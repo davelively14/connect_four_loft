@@ -1,6 +1,10 @@
 defmodule ConnectFourBackendWeb.GameView do
   use ConnectFourBackendWeb, :view
 
+  ###########
+  # Renders #
+  ###########
+
   def render("state.json", %{game_state: game_state, game_id: game_id}) do
     %{
       id: game_id,
@@ -21,6 +25,10 @@ defmodule ConnectFourBackendWeb.GameView do
   def render("error.json", %{error: error}) do
     %{error: error}
   end
+
+  ########################
+  # Supporting Functions #
+  ########################
 
   def board_to_array(board) do
     board
