@@ -36,7 +36,8 @@ defmodule ConnectFour.GameServerTest do
       assert is_atom new_game.current_player
       assert is_integer new_game.height
       assert is_integer new_game.width
-      assert !new_game.finished
+      refute new_game.finished
+      refute new_game.difficulty
     end
 
     test "advances next_id", %{initial_state: initial_state} do
