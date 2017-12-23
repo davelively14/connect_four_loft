@@ -1,7 +1,8 @@
 defmodule ConnectFour do
   use Application
 
-  def start do
+  def start, do: start(nil, nil)
+  def start(_, _) do
     import Supervisor.Spec
 
     children = [
