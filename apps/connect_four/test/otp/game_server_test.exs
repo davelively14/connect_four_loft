@@ -40,9 +40,8 @@ defmodule ConnectFour.GameServerTest do
     end
 
     test "advances next_id", %{initial_state: initial_state} do
-      assert initial_state.next_id == 1
       GameServer.new_game()
-      assert GameServer.get_state() |> Map.get(:next_id) == 2
+      assert GameServer.get_state() |> Map.get(:next_id) == initial_state.next_id + 1
     end
 
     test "creates a new game with a different id" do
@@ -76,7 +75,7 @@ defmodule ConnectFour.GameServerTest do
   describe "get_state/0" do
     test "returns state with default params" do
       state = GameServer.get_state()
-      assert state.next_id == 1
+      assert is_integer(state.next_id)
       assert state.ets == :games
     end
   end
