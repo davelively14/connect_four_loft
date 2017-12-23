@@ -6,10 +6,6 @@ defmodule ConnectFourBackendWeb.GameController do
     height = ensure_positive_int(height)
     width = ensure_positive_int(width)
 
-    if :erlang.whereis(ConnectFour) == :undefined do
-      ConnectFour.start()
-    end
-
     if height && width do
       {:ok, game_id} = GameServer.new_game(height, width)
       game_state = GameServer.get_game(game_id)
