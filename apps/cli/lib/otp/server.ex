@@ -115,7 +115,7 @@ defmodule CLI.Server do
         case result do
           :ok ->
             IO.puts "Added a piece to column #{selection}"
-            cpu_play = AI.select_column(GameServer.game_state(state.game_id), difficulty)
+            cpu_play = AI.select_column(GameServer.get_game(state.game_id), difficulty)
 
             case GameServer.drop_piece(state.game_id, cpu_play) do
               :ok ->
