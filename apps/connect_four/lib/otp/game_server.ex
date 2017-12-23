@@ -84,7 +84,11 @@ defmodule ConnectFour.GameServer do
           {:reply, {:ok, new_game_state.finished}, state}
         end
       true ->
-        {:reply, {:error, "Column #{col} is full. Chose another column."}, state}
+        unless col < 1 || col > game.width do
+          {:reply, {:error, "Column #{col} is full. Chose another column."}, state}
+        else
+          {:reply, {:error, "Invalid column"}, state}
+        end
     end
   end
 
