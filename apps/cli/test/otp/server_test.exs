@@ -6,7 +6,7 @@ defmodule CLI.ServerTest do
 
   setup context do
     if context[:start_game_server] do
-      ConnectFour.start(nil)
+      ConnectFour.start()
     end
 
     start_fn = fn () ->
@@ -51,37 +51,37 @@ defmodule CLI.ServerTest do
     end
   end
 
-  # describe "select(:main_menu)" do
-  #   test "quit works regardless of case or trailing spaces", %{main_menu: main_menu} do
-  #     assert capture_io("q ", main_menu)
-  #     assert capture_io("Q   ", main_menu)
-  #   end
-  #
-  #   test "prints main menu", %{main_menu: main_menu} do
-  #     assert capture_io("Q", main_menu) =~ "Main Menu"
-  #   end
-  #
-  #   test "invalid selection informs the user of such and loads main menu again", %{main_menu: main_menu} do
-  #     assert capture_io([input: "9\nq"], main_menu) =~ "Invalid selection, please try again\n\nMain Menu"
-  #   end
-  # end
-  #
-  # describe "select({:new_game, 2})" do
-  #   @describetag :start_game_server
-  #
-  #   test "asks for first player's name", %{new_two_player: new_two_player} do
-  #     assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter first player's name"
-  #   end
-  #
-  #   test "asks for second player's name", %{new_two_player: new_two_player} do
-  #     assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter second player's name"
-  #   end
-  #
-  #   test "after entering names, displays game launch greeting", %{new_two_player: new_two_player} do
-  #     assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Let's play!"
-  #   end
-  # end
-  #
+  describe "select(:main_menu)" do
+    test "quit works regardless of case or trailing spaces", %{main_menu: main_menu} do
+      assert capture_io("q ", main_menu)
+      assert capture_io("Q   ", main_menu)
+    end
+
+    test "prints main menu", %{main_menu: main_menu} do
+      assert capture_io("Q", main_menu) =~ "Main Menu"
+    end
+
+    test "invalid selection informs the user of such and loads main menu again", %{main_menu: main_menu} do
+      assert capture_io([input: "9\nq"], main_menu) =~ "Invalid selection, please try again\n\nMain Menu"
+    end
+  end
+
+  describe "select({:new_game, 2})" do
+    @describetag :start_game_server
+
+    test "asks for first player's name", %{new_two_player: new_two_player} do
+      assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter first player's name"
+    end
+
+    test "asks for second player's name", %{new_two_player: new_two_player} do
+      assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Enter second player's name"
+    end
+    
+    test "after entering names, displays game launch greeting", %{new_two_player: new_two_player} do
+      assert capture_io([input: "a\nb\nq"], new_two_player) =~ "Let's play!"
+    end
+  end
+
   # describe "select({:new_game, :easy})" do
   #   @describetag :start_game_server
   #
