@@ -11,7 +11,7 @@ defmodule ConnectFourBackendWeb.GameView do
       },
       height: game_state.height,
       width: game_state.width,
-      last_play: game_state.last_play,
+      last_play: check_last_play(game_state.last_play),
       avail_cols: 1..game_state.width |> Enum.to_list,
       current_player: game_state.current_player,
       finished: game_state.finished
@@ -27,4 +27,10 @@ defmodule ConnectFourBackendWeb.GameView do
     |> MapSet.to_list
     |> Enum.map(&([&1 |> elem(0), &1 |> elem(1)]))
   end
+
+  defp check_last_play(last_play) when is_tuple(last_play) do
+    {player, {x, y}} = last_play
+    [player, [x, y]]
+  end
+  defp check_last_play(_), do: nil
 end
