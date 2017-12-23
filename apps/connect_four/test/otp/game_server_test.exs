@@ -44,6 +44,33 @@ defmodule ConnectFour.GameServerTest do
       GameServer.new_game()
       assert GameServer.get_state() |> Map.get(:next_id) == 2
     end
+
+    test "creates a new game with a different id" do
+      {:ok, initial_game_id} = GameServer.new_game()
+      GameServer.drop_piece(initial_game_id, 1)
+      {:ok, new_game_id} = GameServer.new_game()
+      refute GameServer.get_game(initial_game_id) == GameServer.get_game(new_game_id)
+    end
+  end
+
+  describe "new_game/3" do
+    @tag :start_new_game
+    test "resets the game and sets height to 5 and width to 2", %{game_id: game_id} do
+      initial_state = GameServer.get_game(game_id)
+      middle_of_game(game_id)
+      GameServer.new_game(game_id, 5, 2)
+
+      new_state = GameServer.get_game(game_id)
+
+      refute new_state == initial_state
+      assert new_state.height == 5
+      assert new_state.width == 2
+      assert new_state.board.free |> MapSet.size == 5 * 2
+    end
+
+    test "returns error if game does not exist" do
+      assert {:error, _} = GameServer.new_game(-1, 5, 2)
+    end
   end
 
   describe "get_state/0" do
@@ -257,20 +284,6 @@ defmodule ConnectFour.GameServerTest do
       assert {:error, _} = GameServer.current_player(-1)
     end
   end
-
-  # describe "new_game/2" do
-  #   test "creates a new game with height 5 and width 2", %{initial_state: initial_state} do
-  #     middle_of_game()
-  #     GameServer.new_game(5, 2)
-  #
-  #     new_state = GameServer.get_state()
-  #
-  #     refute new_state == initial_state
-  #     assert new_state.height == 5
-  #     assert new_state.width == 2
-  #     assert new_state.board.free |> MapSet.size == 5 * 2
-  #   end
-  # end
 
   #####################
   # Private Functions #

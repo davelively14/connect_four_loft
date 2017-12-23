@@ -28,6 +28,10 @@ defmodule ConnectFour.GameServer do
   def new_game(height, width) do
     GenServer.call(__MODULE__, {:new_game, height, width})
   end
+  def new_game(game_id), do: new_game(game_id, @default_height, @default_width)
+  def new_game(game_id, height, width) do
+    GenServer.call(__MODULE__, {:new_game, game_id, height, width})
+  end
 
   def get_game(game_id) do
     GenServer.call(__MODULE__, {:get_game, game_id})
@@ -102,6 +106,20 @@ defmodule ConnectFour.GameServer do
     :ets.insert(state.ets, {state.next_id, new_game})
 
     {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
+  end
+
+  def handle_call({:new_game, game_id, height, width}, _from, state) do
+    new_game = create_new_game(height, width)
+
+    resp = fetch_game_from_ets(state.ets, game_id)
+
+    cond do
+      is_tuple(resp) ->
+        {:reply, resp, state}
+      true ->
+        :ets.insert(state.ets, {game_id, new_game})
+        {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
+    end
   end
 
   def handle_call({:get_game, game_id}, _from, state) do
