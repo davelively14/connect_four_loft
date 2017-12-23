@@ -1,1 +1,1 @@
-CLI.start(nil, nil)
+CLI.start
