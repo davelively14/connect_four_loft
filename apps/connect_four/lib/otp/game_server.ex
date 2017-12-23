@@ -20,8 +20,8 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, {:drop_piece, game_id, col})
   end
 
-  def reset_game do
-    GenServer.call(__MODULE__, :reset_game)
+  def reset_game(game_id) do
+    GenServer.call(__MODULE__, {:reset_game, game_id})
   end
 
   def new_game, do: new_game(@default_height, @default_width)
@@ -84,9 +84,16 @@ defmodule ConnectFour.GameServer do
     end
   end
 
-  def handle_call(:reset_game, _from, state) do
-    new_state = create_new_game(state.height, state.width)
-    {:reply, :ok, new_state}
+  def handle_call({:reset_game, game_id}, _from, state) do
+    game = fetch_game_from_ets(state.ets, game_id)
+
+    cond do
+      is_tuple(game) ->
+        {:reply, game, state}
+      true ->
+        :ets.insert(state.ets, {game_id, create_new_game(game.height, game.width)})
+        {:reply, :ok, state}
+    end
   end
 
   def handle_call({:new_game, height, width}, _from, state) do
