@@ -12,7 +12,7 @@ defmodule ConnectFourBackend.Application do
       supervisor(ConnectFourBackend.Repo, []),
       # Start the endpoint when the application starts
       supervisor(ConnectFourBackendWeb.Endpoint, []),
-      supervisor(ConnectFour, [], [function: :start])
+      # supervisor(ConnectFour, [], [function: :start])
       # Start your own worker by calling: ConnectFourBackend.Worker.start_link(arg1, arg2, arg3)
       # worker(ConnectFourBackend.Worker, [arg1, arg2, arg3]),
     ]
