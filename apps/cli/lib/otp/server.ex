@@ -45,22 +45,22 @@ defmodule CLI.Server do
   end
 
   def select({:new_game, 2}) do
-    GameServer.reset_game()
+    {:ok, game_id} = GameServer.new_game()
     player_1 = IO.gets "Enter first player's name: "
     player_2 = IO.gets "Enter second player's name: "
     IO.puts "Let's play!\nEnter 'q' at any time to quit the game."
-    select({:play_game, 2, %{player_1: player_1, player_2: player_2}})
+    select({:play_game, 2, %{player_1: player_1, player_2: player_2, game_id: game_id}})
   end
 
   def select({:new_game, difficulty}) do
-    GameServer.reset_game()
+    {:ok, game_id} = GameServer.new_game()
     player_1 = IO.gets "Enter player's name: "
     IO.puts "Let's play!\nEnter 'q' at any time to quit the game."
-    select({:play_game, difficulty, %{player_1: player_1, player_2: "CPU"}})
+    select({:play_game, difficulty, %{player_1: player_1, player_2: "CPU", game_id: game_id}})
   end
 
   def select({:play_game, 2, state}) do
-    game_state = GameServer.get_state
+    game_state = GameServer.get_game(state.game_id)
     options = prep_options(game_state.avail_cols)
 
     print_board(game_state)
@@ -72,7 +72,7 @@ defmodule CLI.Server do
       if selection == "Q" do
         exit_game()
       else
-        result = GameServer.drop_piece(String.to_integer(selection))
+        result = GameServer.drop_piece(state.game_id, String.to_integer(selection))
 
         case result do
           :ok ->
@@ -98,7 +98,7 @@ defmodule CLI.Server do
   end
 
   def select({:play_game, difficulty, state}) do
-    game_state = GameServer.get_state
+    game_state = GameServer.get_game(state.game_id)
     options = prep_options(game_state.avail_cols)
 
     print_board(game_state)
@@ -110,14 +110,14 @@ defmodule CLI.Server do
       if selection == "Q" do
         exit_game()
       else
-        result = GameServer.drop_piece(String.to_integer(selection))
+        result = GameServer.drop_piece(state.game_id, String.to_integer(selection))
 
         case result do
           :ok ->
             IO.puts "Added a piece to column #{selection}"
-            cpu_play = AI.select_column(GameServer.get_state, difficulty)
+            cpu_play = AI.select_column(GameServer.game_state(state.game_id), difficulty)
 
-            case GameServer.drop_piece(cpu_play) do
+            case GameServer.drop_piece(state.game_id, cpu_play) do
               :ok ->
                 IO.puts "CPU adds a piece to column #{cpu_play}"
                 select({:play_game, difficulty, state})
