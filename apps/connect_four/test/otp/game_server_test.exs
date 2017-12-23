@@ -198,43 +198,52 @@ defmodule ConnectFour.GameServerTest do
     end
   end
 
-  # describe "reset_game/0" do
-  #   test "resets a game to original parameters with game in progress", %{initial_state: initial_state} do
-  #     middle_of_game()
-  #     current_state = GameServer.get_state()
-  #     refute current_state.finished
-  #     refute initial_state == current_state
-  #
-  #     assert :ok == GameServer.reset_game()
-  #
-  #     reset_state = GameServer.get_state()
-  #     assert reset_state == initial_state
-  #   end
-  #
-  #   test "resets a game to original parameters when game is won", %{initial_state: initial_state} do
-  #     win_game_vertical()
-  #     current_state = GameServer.get_state()
-  #     assert current_state.finished == :player_1
-  #     refute initial_state == current_state
-  #
-  #     assert :ok == GameServer.reset_game()
-  #
-  #     reset_state = GameServer.get_state()
-  #     assert reset_state == initial_state
-  #   end
-  #
-  #   test "resets a game to original parameters when game is a draw", %{initial_state: initial_state} do
-  #     fill_board()
-  #     current_state = GameServer.get_state()
-  #     assert current_state.finished == :draw
-  #     refute initial_state == current_state
-  #
-  #     assert :ok == GameServer.reset_game()
-  #
-  #     reset_state = GameServer.get_state()
-  #     assert reset_state == initial_state
-  #   end
-  # end
+  describe "reset_game/1" do
+    @describetag :start_new_game
+
+    test "resets a game to original parameters with game in progress", %{game_id: game_id} do
+      initial_state = GameServer.get_game(game_id)
+      middle_of_game(game_id)
+      current_state = GameServer.get_game(game_id)
+      refute current_state.finished
+      refute initial_state == current_state
+
+      assert :ok == GameServer.reset_game(game_id)
+
+      reset_state = GameServer.get_game(game_id)
+      assert reset_state == initial_state
+    end
+
+    test "invalid game_id results in error" do
+      assert {:error, _} = GameServer.reset_game(-1)
+    end
+
+    test "resets a game to original parameters when game is won", %{game_id: game_id} do
+      initial_state = GameServer.get_game(game_id)
+      win_game_vertical(game_id)
+      current_state = GameServer.get_game(game_id)
+      assert current_state.finished == :player_1
+      refute initial_state == current_state
+
+      assert :ok == GameServer.reset_game(game_id)
+
+      reset_state = GameServer.get_game(game_id)
+      assert reset_state == initial_state
+    end
+
+    test "resets a game to original parameters when game is a draw", %{game_id: game_id} do
+      initial_state = GameServer.get_game(game_id)
+      fill_board(game_id)
+      current_state = GameServer.get_game(game_id)
+      assert current_state.finished == :draw
+      refute initial_state == current_state
+
+      assert :ok == GameServer.reset_game(game_id)
+
+      reset_state = GameServer.get_game(game_id)
+      assert reset_state == initial_state
+    end
+  end
   #
   # describe "current_player/0" do
   #   test "returns the current player" do
@@ -328,15 +337,15 @@ defmodule ConnectFour.GameServerTest do
     GameServer.drop_piece(game_id, 1)
   end
 
-  defp middle_of_game do
+  defp middle_of_game(game_id) do
     for outer <- 0..1 do
       for x <- 1..3 do
         for _ <- 0..4 do
-          GameServer.drop_piece(x + outer * 3)
+          GameServer.drop_piece(game_id, x + outer * 3)
         end
       end
       for x <- 1..3 do
-        GameServer.drop_piece(x + outer * 3)
+        GameServer.drop_piece(game_id, x + outer * 3)
       end
     end
   end
