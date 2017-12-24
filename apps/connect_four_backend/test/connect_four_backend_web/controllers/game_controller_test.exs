@@ -61,7 +61,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     end
   end
 
-  describe "PUT update, no difficulty" do
+  describe "PUT update, two player game" do
     setup :game_started
 
     test "with valid game_id and column, returns an updated game state", %{conn: conn, game_id: game_id} do
@@ -102,25 +102,16 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     end
   end
 
-  describe "PUT update, with difficulty" do
-    setup :game_started
+  describe "PUT update, cpu difficulty" do
+    setup :game_started_easy
 
-    test "with valid game_id, column, and difficulty cpu will make a move", %{conn: conn, game_id: game_id} do
-      conn = put conn, game_path(conn, :update, game_id), col: 1, difficulty: "easy"
+    test "with valid column, CPU moves as well", %{conn: conn, game_id: game_id} do
+      conn = put conn, game_path(conn, :update, game_id), col: 1
       assert resp = json_response(conn, 200)
 
-      assert resp["id"] == game_id
+      assert ["player_2", [_, _]] = resp["last_play"]
       assert resp["board"]["player_1"] |> length == 1
       assert resp["board"]["player_2"] |> length == 1
-    end
-
-    test "with valid game_id and column, and invalid difficulty, CPU does not move", %{conn: conn, game_id: game_id} do
-      conn = put conn, game_path(conn, :update, game_id), col: 1, difficulty: "hotly"
-      assert resp = json_response(conn, 200)
-
-      assert resp["id"] == game_id
-      assert resp["board"]["player_1"] |> length == 1
-      assert resp["board"]["player_2"] |> length == 0
     end
   end
 
@@ -137,7 +128,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
 
   defp game_started_easy(_context) do
     GameServer.start_link()
-    {:ok, game_id} = GameServer.new_game(:easy)
+    {:ok, game_id} = GameServer.new_game(difficulty: :easy)
 
     {:ok, game_id: game_id}
   end
