@@ -18,7 +18,8 @@ defmodule ConnectFourBackendWeb.GameView do
       last_play: check_last_play(game_state.last_play),
       avail_cols: 1..game_state.width |> Enum.to_list,
       current_player: game_state.current_player,
-      finished: game_state.finished
+      finished: game_state.finished,
+      difficulty: game_state.difficulty
     }
   end
 
