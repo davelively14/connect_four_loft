@@ -53,12 +53,50 @@ defmodule ConnectFour.GameServerTest do
     end
   end
 
-  describe "new_game/3" do
+  describe "new_game/1" do
+    test "starts new game with custom height and width" do
+      {:ok, game_id} = GameServer.new_game(height: 10, width: 10)
+      game_state = GameServer.get_game(game_id)
+
+      assert game_state.height == 10
+      assert game_state.width == 10
+    end
+
+    test "starts new game with :easy settings" do
+      {:ok, game_id} = GameServer.new_game(difficulty: :easy)
+      assert %{difficulty: :easy} = GameServer.get_game(game_id)
+    end
+
+    test "starts new game with :hard settings" do
+      {:ok, game_id} = GameServer.new_game(difficulty: :hard)
+      assert %{difficulty: :hard} = GameServer.get_game(game_id)
+    end
+
+    test "returns error if invalid height" do
+      assert {:error, _} = GameServer.new_game(height: -1)
+      assert {:error, _} = GameServer.new_game(height: 999_999_999)
+    end
+
+    test "returns error if invalid width" do
+      assert {:error, _} = GameServer.new_game([width: -1])
+      assert {:error, _} = GameServer.new_game([width: 999_999_999])
+    end
+
+    test "accepts valid difficulties" do
+      assert {:ok, _} = GameServer.new_game([difficulty: :easy])
+      assert {:ok, _} = GameServer.new_game([difficulty: :hard])
+      assert {:ok, _} = GameServer.new_game([difficulty: nil])
+    end
+
+    test "returns error if invalid difficulty" do
+      assert {:error, _} = GameServer.new_game([difficulty: :super_hard])
+    end
+
     @tag :start_new_game
     test "resets the game and sets height to 5 and width to 2", %{game_id: game_id} do
       initial_state = GameServer.get_game(game_id)
       middle_of_game(game_id)
-      GameServer.new_game(game_id, 5, 2)
+      GameServer.new_game(game_id: game_id, height: 5, width: 2)
 
       new_state = GameServer.get_game(game_id)
 
@@ -69,7 +107,11 @@ defmodule ConnectFour.GameServerTest do
     end
 
     test "returns error if game does not exist" do
-      assert {:error, _} = GameServer.new_game(-1, 5, 2)
+      assert {:error, _} = GameServer.new_game(game_id: -1)
+    end
+
+    test "returns error if game_id is invalid" do
+      assert {:error, _} = GameServer.new_game(game_id: "hello")
     end
   end
 
