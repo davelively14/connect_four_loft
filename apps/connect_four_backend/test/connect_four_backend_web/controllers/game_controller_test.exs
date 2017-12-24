@@ -3,6 +3,8 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
   alias ConnectFour.GameServer
 
   describe "POST create" do
+    setup :game_started
+
     test "with no parameters, starts a new game with default dimensions", %{conn: conn} do
       conn = post conn, game_path(conn, :create)
       assert state = json_response(conn, 201)
@@ -12,13 +14,37 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
       assert state["board"]["free"] |> length == 6 * 7
     end
 
-    test "with parameters, will start a new game with specified dimensions", %{conn: conn} do
+    test "with height and width parameters, will start a new game with specified dimensions", %{conn: conn} do
       conn = post conn, game_path(conn, :create), height: 2, width: 10
       assert state = json_response(conn, 201)
 
       assert state["height"] == 2
       assert state["width"] == 10
       assert state["board"]["free"] |> length == 2 * 10
+    end
+
+    test "with game_id, will start a new game for same id", %{conn: conn, game_id: game_id} do
+      conn = post conn, game_path(conn, :create), game_id: game_id
+      assert state = json_response(conn, 201)
+
+      assert state["id"] == game_id
+    end
+
+    test "returns error with game_id for game that does not exist", %{conn: conn} do
+      conn = post conn, game_path(conn, :create), game_id: 999
+      assert %{"error" => "Game does not exist"} == json_response(conn, 422)
+    end
+
+    test "can set difficulty", %{conn: conn} do
+      conn = post conn, game_path(conn, :create), difficulty: "easy"
+      assert state = json_response(conn, 201)
+
+      assert state["difficulty"] == "easy"
+    end
+
+    test "cannot set unaccepted difficulty", %{conn: conn} do
+      conn = post conn, game_path(conn, :create), difficulty: "twitter_hard"
+      assert %{"error" => "Invalid parameters"} == json_response(conn, 422)
     end
 
     test "with incorrect parameters, will start a game with default parameters", %{conn: conn} do

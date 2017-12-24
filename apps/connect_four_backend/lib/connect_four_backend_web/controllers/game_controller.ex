@@ -2,21 +2,22 @@ defmodule ConnectFourBackendWeb.GameController do
   use ConnectFourBackendWeb, :controller
   alias ConnectFour.{GameServer, AI}
 
-  def create(conn, %{"width" => width, "height" => height}) do
-    height = ensure_positive_int(height)
-    width = ensure_positive_int(width)
+  def create(conn, opts \\ %{}) do
+    opts = map_to_keyword_list(opts)
 
-    if height && width do
-      {:ok, game_id} = GameServer.new_game(height: height, width: width)
-      game_state = GameServer.get_game(game_id)
-      conn
-      |> put_status(:created)
-      |> render("state.json", %{game_state: game_state, game_id: game_id})
-    else
-      render_error(conn, 422, "Invalid parameters")
+    case GameServer.new_game(opts) do
+      {:ok, game_id} ->
+        game_state = GameServer.get_game(game_id)
+
+        conn
+        |> put_status(:created)
+        |> render("state.json", %{game_state: game_state, game_id: game_id})
+      {:error, reason} ->
+        render_error(conn, 422, reason)
+      _ ->
+        render_error(conn, 400, "Unknown error")
     end
   end
-  def create(conn, _), do: create(conn, %{"width" => 7, "height" => 6})
 
   def show(conn, %{"id" => id}) do
     if game_id = ensure_positive_int(id) do
@@ -81,5 +82,15 @@ defmodule ConnectFourBackendWeb.GameController do
     conn
     |> put_status(status)
     |> render("error.json", %{error: reason})
+  end
+
+  defp map_to_keyword_list(map) do
+    Enum.map(map, fn {key, value} ->
+      if int_value = ensure_positive_int(value) do
+        {String.to_atom(key), int_value}
+      else
+        {String.to_atom(key), String.to_atom(value)}
+      end
+    end)
   end
 end
