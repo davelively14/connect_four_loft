@@ -23,8 +23,11 @@ Name | Required | Type | Notes
 --- | :---: | :---: | ---
 *height* | no | integer | Height of board. Default is 6.
 *width* | no | integer | Height of board. Default is 7.
+*game_id* | no | integer | Can start a new game using an already existing game id.
+*difficulty* | no | string | `easy` and `hard` are supported. Default is `null`.
 
-API path pattern: `api/new_user?height=integer&width=integer`
+API path pattern: `api/new_user?height=integer&width=integer&difficulty=:easy`
+- If no difficulty is provided, the game will be treated as a two player game. You must select either `easy` or `hard` to begin a game with an AI opponent.
 - Use the `&` operator to string together params.
 - Sent via the http `POST` method.
 
@@ -37,7 +40,7 @@ http://localhost:4000/api/game
 ```
 ```code
 POST
-http://localhost:4000/api/game?height=6&width=7
+http://localhost:4000/api/game?height=6&width=7&game_id=1
 ```
 
 Return body:
@@ -48,6 +51,7 @@ Return body:
     "id": 1,
     "height": 6,
     "finished": null,
+    "difficulty": null,
     "current_player": "player_1",
     "board": {
         "player_2": [],
@@ -96,6 +100,7 @@ Return body:
     "id": 1,
     "height": 6,
     "finished": null,
+    "difficulty": null,
     "current_player": "player_1",
     "board": {
         "player_2": [],
