@@ -22,13 +22,13 @@ $ mix run apps/cli/lib/start_cli.exs
 - Create user interface for a two player game
   - CLI for a two human player version
 
-#### Level 2 (Not Started)
+#### Level 2 (Complete)
 
 - Create AI
   - Block human user when able
   - Randomly select next move when choice available
 
-#### Level 3 (Not Started)
+#### Level 3 (Under way)
 
 - Create backend
   - Build websocket API to serve data via backend
