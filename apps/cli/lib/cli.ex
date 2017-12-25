@@ -14,7 +14,10 @@ defmodule CLI do
       name: CLI.Supervisor
     ]
 
-    Supervisor.start_link(children, options)
+    if :erlang.whereis(ConnectFour.Supervisor) == :undefined do
+      Supervisor.start_link(children, options)
+    end
+    
     CLI.Server.start
   end
 end

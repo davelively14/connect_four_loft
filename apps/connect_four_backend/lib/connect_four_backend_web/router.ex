@@ -23,6 +23,7 @@ defmodule ConnectFourBackendWeb.Router do
   scope "/api", ConnectFourBackendWeb do
     pipe_through :api
 
-    resources "/game", GameController, only: [:create]
+    resources "/game", GameController, only: [:create, :show, :update]
+    put "/game/reset/:id", GameController, :reset
   end
 end

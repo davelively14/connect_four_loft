@@ -26,5 +26,21 @@ defmodule ConnectFourBackendWeb.GameViewTest do
       refute state.finished
       refute state.last_play
     end
+
+    test "renders last_play appropriately", %{game_id: game_id} do
+      assert state = GameView.render("state.json", %{game_state: GameServer.get_game(game_id), game_id: game_id})
+      assert state.last_play == nil
+
+      GameServer.drop_piece(game_id, 1)
+
+      assert state = GameView.render("state.json", %{game_state: GameServer.get_game(game_id), game_id: game_id})
+      assert state.last_play == [:player_1, [1, 1]]
+    end
+  end
+
+  describe "error.json" do
+    test "renders appropriate message" do
+      assert %{error: "An error"} == GameView.render("error.json", %{error: "An error"})
+    end
   end
 end

@@ -36,13 +36,13 @@ defmodule ConnectFour.GameServerTest do
       assert is_atom new_game.current_player
       assert is_integer new_game.height
       assert is_integer new_game.width
-      assert !new_game.finished
+      refute new_game.finished
+      refute new_game.difficulty
     end
 
     test "advances next_id", %{initial_state: initial_state} do
-      assert initial_state.next_id == 1
       GameServer.new_game()
-      assert GameServer.get_state() |> Map.get(:next_id) == 2
+      assert GameServer.get_state() |> Map.get(:next_id) == initial_state.next_id + 1
     end
 
     test "creates a new game with a different id" do
@@ -53,12 +53,50 @@ defmodule ConnectFour.GameServerTest do
     end
   end
 
-  describe "new_game/3" do
+  describe "new_game/1" do
+    test "starts new game with custom height and width" do
+      {:ok, game_id} = GameServer.new_game(height: 10, width: 10)
+      game_state = GameServer.get_game(game_id)
+
+      assert game_state.height == 10
+      assert game_state.width == 10
+    end
+
+    test "starts new game with :easy settings" do
+      {:ok, game_id} = GameServer.new_game(difficulty: :easy)
+      assert %{difficulty: :easy} = GameServer.get_game(game_id)
+    end
+
+    test "starts new game with :hard settings" do
+      {:ok, game_id} = GameServer.new_game(difficulty: :hard)
+      assert %{difficulty: :hard} = GameServer.get_game(game_id)
+    end
+
+    test "returns error if invalid height" do
+      assert {:error, _} = GameServer.new_game(height: -1)
+      assert {:error, _} = GameServer.new_game(height: 999_999_999)
+    end
+
+    test "returns error if invalid width" do
+      assert {:error, _} = GameServer.new_game([width: -1])
+      assert {:error, _} = GameServer.new_game([width: 999_999_999])
+    end
+
+    test "accepts valid difficulties" do
+      assert {:ok, _} = GameServer.new_game([difficulty: :easy])
+      assert {:ok, _} = GameServer.new_game([difficulty: :hard])
+      assert {:ok, _} = GameServer.new_game([difficulty: nil])
+    end
+
+    test "returns error if invalid difficulty" do
+      assert {:error, _} = GameServer.new_game([difficulty: :super_hard])
+    end
+
     @tag :start_new_game
     test "resets the game and sets height to 5 and width to 2", %{game_id: game_id} do
       initial_state = GameServer.get_game(game_id)
       middle_of_game(game_id)
-      GameServer.new_game(game_id, 5, 2)
+      GameServer.new_game(game_id: game_id, height: 5, width: 2)
 
       new_state = GameServer.get_game(game_id)
 
@@ -69,14 +107,18 @@ defmodule ConnectFour.GameServerTest do
     end
 
     test "returns error if game does not exist" do
-      assert {:error, _} = GameServer.new_game(-1, 5, 2)
+      assert {:error, _} = GameServer.new_game(game_id: -1)
+    end
+
+    test "returns error if game_id is invalid" do
+      assert {:error, _} = GameServer.new_game(game_id: "hello")
     end
   end
 
   describe "get_state/0" do
     test "returns state with default params" do
       state = GameServer.get_state()
-      assert state.next_id == 1
+      assert is_integer(state.next_id)
       assert state.ets == :games
     end
   end
@@ -123,7 +165,7 @@ defmodule ConnectFour.GameServerTest do
     test "invalid play returns error", %{game_id: game_id} do
       for _ <- 1..6, do: GameServer.drop_piece(game_id, 1)
       initial_game_state = GameServer.get_game(game_id)
-      assert {:error, "Column 1 is full. Chose another column."} == GameServer.drop_piece(game_id, 1)
+      assert {:error, "Column 1 is full. Choose another column."} == GameServer.drop_piece(game_id, 1)
 
       end_game_state = GameServer.get_game(game_id)
       assert initial_game_state.current_player == end_game_state.current_player

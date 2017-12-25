@@ -24,13 +24,8 @@ defmodule ConnectFour.GameServer do
     GenServer.call(__MODULE__, {:reset_game, game_id})
   end
 
-  def new_game, do: new_game(@default_height, @default_width)
-  def new_game(height, width) do
-    GenServer.call(__MODULE__, {:new_game, height, width})
-  end
-  def new_game(game_id), do: new_game(game_id, @default_height, @default_width)
-  def new_game(game_id, height, width) do
-    GenServer.call(__MODULE__, {:new_game, game_id, height, width})
+  def new_game(opts \\ []) do
+    GenServer.call(__MODULE__, {:new_game, opts})
   end
 
   def get_game(game_id) do
@@ -84,7 +79,11 @@ defmodule ConnectFour.GameServer do
           {:reply, {:ok, new_game_state.finished}, state}
         end
       true ->
-        {:reply, {:error, "Column #{col} is full. Chose another column."}, state}
+        unless col < 1 || col > game.width do
+          {:reply, {:error, "Column #{col} is full. Choose another column."}, state}
+        else
+          {:reply, {:error, "Invalid column"}, state}
+        end
     end
   end
 
@@ -95,30 +94,38 @@ defmodule ConnectFour.GameServer do
       is_tuple(game) ->
         {:reply, game, state}
       true ->
-        :ets.insert(state.ets, {game_id, create_new_game(game.height, game.width)})
+        :ets.insert(state.ets, {game_id, create_new_game(game.height, game.width, game.difficulty)})
         {:reply, :ok, state}
     end
   end
 
-  def handle_call({:new_game, height, width}, _from, state) do
-    new_game = create_new_game(height, width)
+  def handle_call({:new_game, opts}, _from, state) do
+    if scrub_opts(opts) do
+      height = opts[:height] || @default_height
+      width = opts[:width] || @default_width
 
-    :ets.insert(state.ets, {state.next_id, new_game})
+      cond do
+        opts[:game_id] ->
+          new_game = create_new_game(height, width, opts[:difficulty])
 
-    {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
-  end
+          resp = fetch_game_from_ets(state.ets, opts[:game_id])
 
-  def handle_call({:new_game, game_id, height, width}, _from, state) do
-    new_game = create_new_game(height, width)
+          cond do
+            is_tuple(resp) ->
+              {:reply, resp, state}
+            true ->
+              :ets.insert(state.ets, {opts[:game_id], new_game})
+              {:reply, {:ok, opts[:game_id]}, state}
+          end
+        true ->
+          new_game = create_new_game(height, width, opts[:difficulty])
 
-    resp = fetch_game_from_ets(state.ets, game_id)
+          :ets.insert(state.ets, {state.next_id, new_game})
 
-    cond do
-      is_tuple(resp) ->
-        {:reply, resp, state}
-      true ->
-        :ets.insert(state.ets, {game_id, new_game})
-        {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
+          {:reply, {:ok, state.next_id}, Map.put(state, :next_id, state.next_id + 1)}
+      end
+    else
+      {:reply, {:error, "Invalid parameters"}, state}
     end
   end
 
@@ -141,7 +148,7 @@ defmodule ConnectFour.GameServer do
   # Support Functions #
   #####################
 
-  defp create_new_game(height, width) do
+  defp create_new_game(height, width, difficulty) do
     %{
       board: %{
         free: setup_board(width, height),
@@ -153,7 +160,8 @@ defmodule ConnectFour.GameServer do
       last_play: nil,
       avail_cols: 1..width |> Enum.to_list,
       current_player: :player_1,
-      finished: nil
+      finished: nil,
+      difficulty: difficulty
     }
   end
 
@@ -213,6 +221,26 @@ defmodule ConnectFour.GameServer do
 
   defp advance_player(:player_1), do: :player_2
   defp advance_player(:player_2), do: :player_1
+
+  defp scrub_opts([]), do: true
+  defp scrub_opts(opts) do
+    height = opts[:height]
+    width = opts[:width]
+    difficulty = opts[:difficulty]
+
+    valid_difficulties = [:easy, :hard]
+
+    cond do
+      height && (!is_integer(height) || height < 1 || height > 10_000) ->
+        false
+      width && (!is_integer(width) || width < 1 || width > 10_000) ->
+        false
+      difficulty && !Enum.member?(valid_difficulties, difficulty) ->
+        false
+      true ->
+        true
+    end
+  end
 
   ################
   # Check Status #
