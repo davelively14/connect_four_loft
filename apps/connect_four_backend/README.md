@@ -15,6 +15,7 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
 * [Create a new game](#new-game)
 * [Get current state of a game](#show-game)
 * [Make a move](#update-game)
+* [Reset game](#reset-game)
 
 ## <a name="new-game"></a>Create a new game:
 
@@ -131,7 +132,7 @@ Return body:
 
 ## <a name="update-game"></a>Make a move:
 
-Drop a token on a given column for a given game. If game has a difficulty level assigned, then the CPU will move before returning the updated game state. If a game difficulty is empty, then it is assumed a two player game. 
+Drop a token on a given column for a given game. If game has a difficulty level assigned, then the CPU will move before returning the updated game state. If a game difficulty is empty, then it is assumed a two player game.
 
 Name | Required | Type | Notes
 --- | :---: | :---: | ---
@@ -165,6 +166,55 @@ Return body:
         "player_1": [
           [ 2, 1 ]
         ],
+        "free": [
+            [ 3, 3 ], [ 7, 6 ], [ 2, 1 ],
+            [ 2, 2 ], [ 6, 4 ], [ 6, 3 ],
+            [ 6, 1 ], [ 4, 5 ], [ 5, 1 ],
+            [ 7, 1 ], [ 3, 1 ], [ 5, 6 ],
+            [ 6, 2 ], [ 1, 3 ], [ 5, 4 ],
+            [ 7, 4 ], [ 3, 5 ], [ 7, 2 ],
+            [ 7, 5 ], [ 3, 4 ], [ 1, 5 ],
+            [ 4, 1 ], [ 5, 2 ], [ 2, 4 ],
+            [ 1, 2 ], [ 1, 4 ], [ 4, 2 ],
+            [ 3, 6 ], [ 1, 6 ], [ 2, 3 ],
+            [ 5, 3 ], [ 2, 6 ], [ 6, 6 ],
+            [ 6, 5 ], [ 5, 5 ], [ 1, 1 ],
+            [ 3, 2 ], [ 4, 6 ], [ 4, 3 ],
+            [ 2, 5 ], [ 4, 4 ], [ 7, 3 ]
+        ]
+    },
+    "avail_cols": [ 1, 2, 3, 4, 5, 6, 7 ]
+}
+```
+
+## <a name="reset-game"></a>Reset game:
+
+Clears the board and resets the game to it's original configuration (height, width, and difficulty level).
+
+API path pattern: `api/game/reset/1`
+- Sent via the http `PUT` method.
+
+#### Example:
+
+HTTP Call:
+```code
+PUT
+http://localhost:4000/api/game/reset/1
+```
+
+Return body:
+```json
+{
+    "width": 7,
+    "last_play": null,
+    "id": 1,
+    "height": 6,
+    "finished": null,
+    "difficulty": null,
+    "current_player": "player_1",
+    "board": {
+        "player_2": [],
+        "player_1": [],
         "free": [
             [ 3, 3 ], [ 7, 6 ], [ 2, 1 ],
             [ 2, 2 ], [ 6, 4 ], [ 6, 3 ],
