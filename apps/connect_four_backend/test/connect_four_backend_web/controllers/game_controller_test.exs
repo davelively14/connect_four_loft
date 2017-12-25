@@ -85,6 +85,12 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
       conn = get conn, game_path(conn, :show, 240)
       assert %{"error" => "Game does not exist"} == json_response(conn, 422)
     end
+
+    test "returns error if a full column is selected", %{conn: conn, game_id: game_id} do
+      col_1_full(game_id)
+      conn = put conn, game_path(conn, :update, game_id), col: 1
+      assert %{"error" => "Column 1 is full. Choose another column."} == json_response(conn, 422)
+    end
   end
 
   describe "PUT update, two player game" do
@@ -194,6 +200,15 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     for _ <- 1..5 do
       GameServer.drop_piece(game_id, 7)
     end
+  end
+
+  defp col_1_full(game_id) do
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
   end
 
   defp game_won(game_id) do
