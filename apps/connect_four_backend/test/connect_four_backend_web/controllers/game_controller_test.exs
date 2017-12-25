@@ -106,6 +106,14 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
       assert resp["finished"]
     end
 
+    test "handles draw condition", %{conn: conn, game_id: game_id} do
+      setup_draw(game_id)
+      conn = put conn, game_path(conn, :update, game_id), col: 7
+      assert resp = json_response(conn, 200)
+
+      assert "draw" = resp["finished"]
+    end
+
     test "handles attempts when game is already over", %{conn: conn, game_id: game_id} do
       game_won(game_id)
       conn = put conn, game_path(conn, :update, game_id), col: 1
@@ -170,6 +178,22 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     GameServer.drop_piece(game_id, 2)
     GameServer.drop_piece(game_id, 1)
     GameServer.drop_piece(game_id, 2)
+  end
+
+  defp setup_draw(game_id) do
+    for outer <- 0..1 do
+      for x <- 1..3 do
+        for _ <- 0..4 do
+          GameServer.drop_piece(game_id, x + outer * 3)
+        end
+      end
+      for x <- 1..3 do
+        GameServer.drop_piece(game_id, x + outer * 3)
+      end
+    end
+    for _ <- 1..5 do
+      GameServer.drop_piece(game_id, 7)
+    end
   end
 
   defp game_won(game_id) do
