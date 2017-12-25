@@ -15,7 +15,7 @@ defmodule ConnectFourBackendWeb.GameController do
       {:error, reason} ->
         render_error(conn, 422, reason)
       _ ->
-        render_error(conn, 400, "Unknown error")
+        render_error(conn, 500, "Unknown error")
     end
   end
 
@@ -61,6 +61,23 @@ defmodule ConnectFourBackendWeb.GameController do
         render_error(conn, 422, game_state |> elem(1))
       true ->
         render_error(conn, 422, "Invalid parameters")
+    end
+  end
+
+  def reset(conn, %{"id" => game_id}) do
+    game_id = ensure_positive_int(game_id)
+
+    if game_id do
+      case GameServer.reset_game(game_id) do
+        :ok ->
+          render conn, "state.json", %{game_state: GameServer.get_game(game_id), game_id: game_id}
+        {:error, reason} ->
+          render_error(conn, 422, reason)
+        true ->
+          render_error(conn, 500, "Unknown error")
+      end
+    else
+      render_error(conn, 422, "Invalid parameters")
     end
   end
 

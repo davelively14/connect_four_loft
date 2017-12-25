@@ -87,7 +87,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     end
   end
 
-  describe "PUT update, two player game" do
+  describe "PATCH update, two player game" do
     setup :game_started
 
     test "with valid game_id and column, returns an updated game state", %{conn: conn, game_id: game_id} do
@@ -142,7 +142,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     end
   end
 
-  describe "PUT update, cpu difficulty" do
+  describe "PATCH update, cpu difficulty" do
     setup :game_started_easy
 
     test "with valid column, CPU moves as well", %{conn: conn, game_id: game_id} do
@@ -152,6 +152,31 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
       assert ["player_2", [_, _]] = resp["last_play"]
       assert resp["board"]["player_1"] |> length == 1
       assert resp["board"]["player_2"] |> length == 1
+    end
+  end
+
+  describe "PUT reset" do
+    setup :game_started_easy
+
+    test "with valid id, will reset game", %{conn: conn, game_id: game_id, initial_game_state: initial_game_state} do
+      setup_win(game_id)
+      conn = put conn, game_path(conn, :reset, game_id)
+      assert resp = json_response(conn, 200)
+      initial_state = ConnectFourBackendWeb.GameView.render("state.json", %{game_state: initial_game_state, game_id: game_id})
+
+      assert resp["board"]["free"] == initial_state.board.free
+    end
+
+    test "with invalid id, will return error", %{conn: conn, game_id: game_id} do
+      setup_win(game_id)
+      conn = put conn, game_path(conn, :reset, 9999)
+      assert %{"error" => "Game does not exist"} == json_response(conn, 422)
+    end
+
+    test "with negative integer, will return invalid parameters error", %{conn: conn, game_id: game_id} do
+      setup_win(game_id)
+      conn = put conn, game_path(conn, :reset, -1)
+      assert %{"error" => "Invalid parameters"} == json_response(conn, 422)
     end
   end
 
@@ -170,7 +195,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     GameServer.start_link()
     {:ok, game_id} = GameServer.new_game(difficulty: :easy)
 
-    {:ok, game_id: game_id}
+    {:ok, game_id: game_id, initial_game_state: GameServer.get_game(game_id)}
   end
 
   #####################
