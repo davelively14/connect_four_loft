@@ -85,19 +85,13 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
       conn = get conn, game_path(conn, :show, 240)
       assert %{"error" => "Game does not exist"} == json_response(conn, 422)
     end
-
-    test "returns error if a full column is selected", %{conn: conn, game_id: game_id} do
-      col_1_full(game_id)
-      conn = put conn, game_path(conn, :update, game_id), col: 1
-      assert %{"error" => "Column 1 is full. Choose another column."} == json_response(conn, 422)
-    end
   end
 
   describe "PUT update, two player game" do
     setup :game_started
 
     test "with valid game_id and column, returns an updated game state", %{conn: conn, game_id: game_id} do
-      conn = put conn, game_path(conn, :update, game_id), col: 1
+      conn = patch conn, game_path(conn, :update, game_id), col: 1
       assert resp = json_response(conn, 200)
 
       assert resp["id"] == game_id
@@ -106,7 +100,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
 
     test "handles win condition", %{conn: conn, game_id: game_id} do
       setup_win(game_id)
-      conn = put conn, game_path(conn, :update, game_id), col: 1
+      conn = patch conn, game_path(conn, :update, game_id), col: 1
       assert resp = json_response(conn, 200)
 
       assert resp["finished"]
@@ -114,7 +108,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
 
     test "handles draw condition", %{conn: conn, game_id: game_id} do
       setup_draw(game_id)
-      conn = put conn, game_path(conn, :update, game_id), col: 7
+      conn = patch conn, game_path(conn, :update, game_id), col: 7
       assert resp = json_response(conn, 200)
 
       assert "draw" = resp["finished"]
@@ -122,23 +116,29 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
 
     test "handles attempts when game is already over", %{conn: conn, game_id: game_id} do
       game_won(game_id)
-      conn = put conn, game_path(conn, :update, game_id), col: 1
+      conn = patch conn, game_path(conn, :update, game_id), col: 1
       assert %{"error" => "player_1 already won the game."} == json_response(conn, 422)
     end
 
     test "with invalid game_id, returns error", %{conn: conn} do
-      conn = put conn, game_path(conn, :update, 9999), col: 1
+      conn = patch conn, game_path(conn, :update, 9999), col: 1
       assert %{"error" => "Game does not exist"} == json_response(conn, 422)
     end
 
     test "with invalid column integer, returns error", %{conn: conn, game_id: game_id} do
-      conn = put conn, game_path(conn, :update, game_id), col: 13
+      conn = patch conn, game_path(conn, :update, game_id), col: 13
       assert %{"error" => "Invalid column"} == json_response(conn, 422)
     end
 
     test "with invalid column format, returns error", %{conn: conn, game_id: game_id} do
-      conn = put conn, game_path(conn, :update, game_id), col: "hello"
+      conn = patch conn, game_path(conn, :update, game_id), col: "hello"
       assert %{"error" => "Invalid parameters"} == json_response(conn, 422)
+    end
+
+    test "returns error if a full column is selected", %{conn: conn, game_id: game_id} do
+      col_1_full(game_id)
+      conn = patch conn, game_path(conn, :update, game_id), col: 1
+      assert %{"error" => "Column 1 is full. Choose another column."} == json_response(conn, 422)
     end
   end
 
@@ -146,7 +146,7 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
     setup :game_started_easy
 
     test "with valid column, CPU moves as well", %{conn: conn, game_id: game_id} do
-      conn = put conn, game_path(conn, :update, game_id), col: 1
+      conn = patch conn, game_path(conn, :update, game_id), col: 1
       assert resp = json_response(conn, 200)
 
       assert ["player_2", [_, _]] = resp["last_play"]

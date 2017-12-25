@@ -94,7 +94,7 @@ defmodule ConnectFour.GameServer do
       is_tuple(game) ->
         {:reply, game, state}
       true ->
-        :ets.insert(state.ets, {game_id, create_new_game(game.height, game.width)})
+        :ets.insert(state.ets, {game_id, create_new_game(game.height, game.width, game.difficulty)})
         {:reply, :ok, state}
     end
   end
@@ -148,7 +148,7 @@ defmodule ConnectFour.GameServer do
   # Support Functions #
   #####################
 
-  defp create_new_game(height, width, difficulty \\ nil) do
+  defp create_new_game(height, width, difficulty) do
     %{
       board: %{
         free: setup_board(width, height),
