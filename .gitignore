@@ -18,3 +18,6 @@ erl_crash.dump
 
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
+
+/apps/connect_four_backend/assets/node_modules
+/apps/connect_four_backend/priv/static/js/application.js
