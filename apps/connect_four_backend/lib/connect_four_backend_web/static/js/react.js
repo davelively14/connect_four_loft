@@ -5,12 +5,11 @@ import { createStore } from 'redux';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
-
-import connectFourApp from './reducers/index';
+import connectFourFrontendApp from './reducers/index';
 import App from './components/app';
 import Landing from './components/landing';
 
-let store = createStore(connectFourApp);
+let store = createStore(connectFourFrontendApp);
 let history = syncHistoryWithStore(browserHistory, store);
 
 render(

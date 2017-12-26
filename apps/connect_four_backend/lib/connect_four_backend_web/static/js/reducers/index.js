@@ -2,9 +2,9 @@ import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 import { reducer as formReducer } from 'redux-form';
 
-const connectFourApp = combineReducers({
+const connectFourFrontendApp = combineReducers({
   routing: routerReducer,
   form: formReducer
 });
 
-export default connectFourApp;
+export default connectFourFrontendApp;
