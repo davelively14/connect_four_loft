@@ -9,7 +9,7 @@ import connectFourFrontendApp from './reducers/index';
 import App from './components/app';
 import Landing from './components/landing';
 
-let store = createStore(connectFourFrontendApp);
+let store = createStore(connectFourFrontendApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 let history = syncHistoryWithStore(browserHistory, store);
 
 render(
