@@ -98,6 +98,17 @@ defmodule ConnectFourBackendWeb.GameControllerTest do
       assert resp["last_play"] == ["player_1", [1, 1]]
     end
 
+    test "when filling up a column, avail_cols removes that column", %{conn: conn, game_id: game_id} do
+      put conn, game_path(conn, :update, game_id), col: 1
+      put conn, game_path(conn, :update, game_id), col: 1
+      put conn, game_path(conn, :update, game_id), col: 1
+      put conn, game_path(conn, :update, game_id), col: 1
+      put conn, game_path(conn, :update, game_id), col: 1
+      conn = put conn, game_path(conn, :update, game_id), col: 1
+      assert resp = json_response(conn, 200)
+      assert resp["avail_cols"] == [2, 3, 4, 5, 6, 7]
+    end
+
     test "handles win condition", %{conn: conn, game_id: game_id} do
       setup_win(game_id)
       conn = put conn, game_path(conn, :update, game_id), col: 1
