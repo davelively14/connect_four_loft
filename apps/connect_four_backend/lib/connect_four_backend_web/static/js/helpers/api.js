@@ -9,3 +9,15 @@ export const url = () => {
 export const newGame = () => {
   return url() + 'api/game';
 };
+
+export const makeMove = (gameId, col) => {
+  return url() + 'api/game/' + gameId + '?col=' + col;
+};
+
+export const resetGame = (gameId) => {
+  return url() + 'api/game/reset/' + gameId;
+};
+
+export const getGameState = (gameId) => {
+  return url() + 'api/game/' + gameId;
+};
