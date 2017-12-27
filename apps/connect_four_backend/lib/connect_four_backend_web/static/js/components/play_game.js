@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as ActionCreators from '../actions/index';
-import { Link } from 'react-router';
 import { browserHistory } from 'react-router';
 
 import Board from './board/board';
@@ -23,6 +22,16 @@ class PlayGame extends Component {
   componentWillMount() {
     if (!this.props.gameState.id) {
       browserHistory.push('/new-game');
+    }
+
+    if (this.props.gameState.finished) {
+      browserHistory.push('/game-over');
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.gameState.finished) {
+      browserHistory.push('/game-over');
     }
   }
 
