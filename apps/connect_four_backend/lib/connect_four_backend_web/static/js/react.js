@@ -10,6 +10,7 @@ import App from './components/app';
 import Landing from './components/landing';
 import NewGame from './components/new_game';
 import PlayGame from './components/play_game';
+import GameOver from './components/game_over';
 
 let store = createStore(connectFourFrontendApp, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 let history = syncHistoryWithStore(browserHistory, store);
@@ -21,6 +22,7 @@ render(
         <IndexRoute component={Landing} />
         <Route path="new-game" component={NewGame} />
         <Route path="play-game" component={PlayGame} />
+        <Route path="game-over" component={GameOver} />
       </Route>
     </Router>
   </Provider>,
