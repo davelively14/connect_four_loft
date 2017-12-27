@@ -9,6 +9,7 @@ import connectFourFrontendApp from './reducers/index';
 import App from './components/app';
 import Landing from './components/landing';
 import NewGame from './components/new_game';
+import NewGameCPU from './components/new_game_cpu';
 import PlayGame from './components/play_game';
 import GameOver from './components/game_over';
 
@@ -21,6 +22,7 @@ render(
       <Route path="/" component={App}>
         <IndexRoute component={Landing} />
         <Route path="new-game" component={NewGame} />
+        <Route path="new-game-cpu" component={NewGameCPU} />
         <Route path="play-game" component={PlayGame} />
         <Route path="game-over" component={GameOver} />
       </Route>
