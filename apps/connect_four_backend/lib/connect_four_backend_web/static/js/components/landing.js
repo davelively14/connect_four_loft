@@ -29,6 +29,10 @@ class Landing extends Component {
             <Link to="new-game">
               <button className="btn btn-primary">New Game</button>
             </Link>
+            &nbsp;
+            <Link to="new-game-cpu">
+              <button className="btn btn-primary">New Game vs CPU</button>
+            </Link>
           </div>
         </div>
       </div>
