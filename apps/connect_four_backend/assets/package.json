@@ -7,6 +7,11 @@
     "test": "jest",
     "test:watch": "npm test -- --watch"
   },
+  "jest": {
+    "roots": [
+      "../test/js"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davelively14/connect_four_loft"
