@@ -6,8 +6,12 @@ export const url = () => {
   }
 };
 
-export const newGame = () => {
-  return url() + 'api/game';
+export const newGame = (difficulty = undefined) => {
+  if (difficulty) {
+    return url() + 'api/game?difficulty=' + difficulty;
+  } else {
+    return url() + 'api/game';
+  }
 };
 
 export const makeMove = (gameId, col) => {
