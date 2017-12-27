@@ -10,9 +10,10 @@ export const SET_GAME_STATE = 'SET_GAME_STATE';
 ******************/
 
 // Game Action Creators
-export const setGameState = (gameState) => {
+export const setGameState = (playerInfo, gameState) => {
   return {
     type: SET_GAME_STATE,
+    playerInfo: playerInfo,
     gameState: gameState
   };
 };
