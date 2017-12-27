@@ -21,7 +21,7 @@ const mapDispatchToProps = function(dispatch) {
 class PlayGame extends Component {
   componentWillMount() {
     if (!this.props.gameState.id) {
-      browserHistory.push('/new-game');
+      browserHistory.push('/');
     }
 
     if (this.props.gameState.finished) {
