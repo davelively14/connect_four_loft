@@ -25,7 +25,7 @@ const mapDispatchToProps = function(dispatch) {
 class GameOver extends Component {
   componentWillMount() {
     if (!this.props.finished) {
-      browserHistory.push('/new-game');
+      browserHistory.push('/');
     }
   }
 
