@@ -11,14 +11,14 @@ const Row = (row, width, board) => {
 
   for (var x = 1; x <= width; x++) {
     switch (true) {
-      case contains(board.player_1, [row, x]):
-        rowMarkup.push(<td className="danger" key={[row, x]}></td>);
+      case contains(board.player_1, [x, row]):
+        rowMarkup.push(<td className="danger" key={[x, row]}></td>);
         break;
-      case contains(board.player_2, [row, x]):
-        rowMarkup.push(<td className="warning" key={[row, x]}></td>);
+      case contains(board.player_2, [x, row]):
+        rowMarkup.push(<td className="warning" key={[x, row]}></td>);
         break;
       default:
-        rowMarkup.push(<td key={[row, x]}></td>);
+        rowMarkup.push(<td key={[x, row]}></td>);
     }
   }
 
