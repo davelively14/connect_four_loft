@@ -4,7 +4,7 @@
 
 // Game Types
 export const SET_GAME_STATE = 'SET_GAME_STATE';
-export const UPDATE_BOARD = 'UPDATE_BOARD';
+export const UPDATE_STATE = 'UPDATE_STATE';
 
 /******************
   ACTION CREATORS
@@ -19,9 +19,9 @@ export const setGameState = (playerInfo, gameState) => {
   };
 };
 
-export const updateBoard = (board) => {
+export const updateState = (state) => {
   return {
-    type: UPDATE_BOARD,
-    board
+    type: UPDATE_STATE,
+    state: state
   };
 };

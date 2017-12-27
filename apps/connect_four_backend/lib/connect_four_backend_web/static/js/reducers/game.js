@@ -1,5 +1,5 @@
 import {
-  SET_GAME_STATE, UPDATE_BOARD
+  SET_GAME_STATE, UPDATE_STATE
 } from '../actions/index';
 
 var initialState = {
@@ -13,10 +13,10 @@ function game(state = initialState, action) {
         action.gameState,
         action.playerInfo
       );
-    case UPDATE_BOARD:
+    case UPDATE_STATE:
       return Object.assign({},
         state,
-        {board: action.board}
+        action.state
       );
     default:
       return state;
