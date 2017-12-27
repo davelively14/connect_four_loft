@@ -19,10 +19,10 @@ const mapStateToProps = function(state) {
 
 class Board extends Component {
   componentWillMount() {
-    
+
   }
 
-  printBoard() {
+  renderBoard() {
     let {board, width, height} = this.props;
     let tableBody = [];
 
@@ -37,7 +37,7 @@ class Board extends Component {
     return(
       <table className="table table-bordered">
         <tbody>
-          {this.printBoard()}
+          {this.renderBoard()}
         </tbody>
       </table>
     );
