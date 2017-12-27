@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
 import Row from './row';
+import ColumnSelector from './column_selector';
 
 const mapStateToProps = function(state) {
   if (state.game.id) {
@@ -35,11 +37,19 @@ class Board extends Component {
 
   render() {
     return(
-      <table className="table table-bordered">
-        <tbody>
-          {this.renderBoard()}
-        </tbody>
-      </table>
+      <div>
+        <table className="table table-bordered">
+          <tbody>
+            {this.renderBoard()}
+          </tbody>
+          <ColumnSelector />
+        </table>
+        <div className="text-center">
+          <Link to="/" className="btn btn-warning">
+            Leave game
+          </Link>
+        </div>
+      </div>
     );
   }
 }
