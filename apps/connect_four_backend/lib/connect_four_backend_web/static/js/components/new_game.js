@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import * as ActionCreators from '../actions/index';
 import { SubmissionError } from 'redux-form';
 import { browserHistory } from 'react-router';
-import { newGame } from '../helpers/api';
 
+import { newGame } from '../helpers/api';
 import NewGameForm from './forms/new_game_form';
 
 const mapStateToProps = function(_state) {
@@ -42,8 +42,8 @@ class NewGame extends Component {
           }
         ).then(
           function(text) {
-            setGameState({player1: values.player1, player2: values.player2}, JSON.parse(text));
-            browserHistory.push('/');
+            setGameState({player_1: values.player1, player_2: values.player2}, JSON.parse(text));
+            browserHistory.push('/play-game');
           }
         );
     }
