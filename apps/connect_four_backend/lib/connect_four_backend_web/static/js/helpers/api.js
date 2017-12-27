@@ -5,3 +5,7 @@ export const url = () => {
     return window.location.protocol + '//' + window.location.hostname + '/';
   }
 };
+
+export const newGame = () => {
+  return url() + 'api/game';
+};
