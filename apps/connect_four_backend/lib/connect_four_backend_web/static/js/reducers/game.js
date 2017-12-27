@@ -9,7 +9,7 @@ var initialState = {
 function game(state = initialState, action) {
   switch(action.type) {
     case SET_GAME_STATE:
-      return action.gameState;
+      return Object.assign({}, action.gameState, action.playerInfo);
     default:
       return state;
   }
