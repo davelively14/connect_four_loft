@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as ActionCreators from '../actions/index';
 import { SubmissionError } from 'redux-form';
 import { browserHistory } from 'react-router';
-import { url } from '../helpers/api';
+import { newGame } from '../helpers/api';
 
 import NewGameForm from './forms/new_game_form';
 
@@ -20,21 +20,32 @@ const mapDispatchToProps = function (dispatch) {
 
 class NewGame extends Component {
   submit(values) {
+    const { setGameState } = this.props;
+
     switch (true) {
       case values.player1 == undefined:
         throw new SubmissionError({
           player1: 'Player 1 name cannot be blank',
           _error: 'Invalid name'
         });
-      case values.player2 == undefined && values.difficulty == undefined:
+      case values.player2 == undefined:
         throw new SubmissionError({
           player2: 'Player 2 name cannot be blank',
           _error: 'Invalid name'
         });
       default:
-        console.log(values);
-        console.log(url());
-        browserHistory.push('/');
+        return fetch(newGame(), {
+          method: 'post'
+        }).then(
+          function(response) {
+            return response.text();
+          }
+        ).then(
+          function(text) {
+            setGameState({player1: values.player1, player2: values.player2}, JSON.parse(text));
+            browserHistory.push('/');
+          }
+        );
     }
   }
 
