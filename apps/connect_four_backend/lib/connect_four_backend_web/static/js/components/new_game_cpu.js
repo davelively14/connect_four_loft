@@ -20,7 +20,6 @@ const mapDispatchToProps = function (dispatch) {
 
 class NewGameCPU extends Component {
   submit(values) {
-    console.log(values);
     const { setGameState } = this.props;
 
     switch (true) {
