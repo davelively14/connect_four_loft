@@ -21,17 +21,18 @@ defmodule ConnectFour.StatusCheck do
   """
   def get_block_cols(game_state) do
     if last_play = game_state.last_play do
-      get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols, [])
+      get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols, nil)
     else
       nil
     end
   end
-  def get_block_cols(board, player, avail_cols), do: get_block_cols(board, player, avail_cols, [])
-  defp get_block_cols(_, _, [], to_block), do: if to_block == [], do: nil, else: to_block
+  def get_block_cols(board, player, avail_cols), do: get_block_cols(board, player, avail_cols, nil)
+  defp get_block_cols(_, _, [], to_block), do: to_block
   defp get_block_cols(board, player, [head | tail], to_block) do
     if loc = find_open(board, head) do
       if check_win_or_draw(board, player, loc) == player do
-        get_block_cols(board, player, tail, [elem(loc, 0) | to_block])
+        elem(loc, 0)
+        # get_block_cols(board, player, tail, [elem(loc, 0) | to_block])
       else
         get_block_cols(board, player, tail, to_block)
       end

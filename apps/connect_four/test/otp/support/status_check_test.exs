@@ -26,24 +26,24 @@ defmodule ConnectFour.StatusCheckTest do
   describe "get_block_cols/3" do
     @tag :setup_board_vert
     test "returns correct column required for blocking vertically", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == [1]
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == 1
     end
 
     @tag :setup_board_lat
     test "returns multiple columns for blocking when multiple ways to win", %{board: board, player: player, avail_cols: avail_cols} do
       result = StatusCheck.get_block_cols(board, player, avail_cols)
 
-      assert result == [2, 6] || result == [6, 2]
+      assert result == 2 || result == 6
     end
 
     @tag :setup_board_diag_back
     test "returns column for blocking a diagonal back", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == [1]
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == 1
     end
 
     @tag :setup_board_diag_fwd
     test "returns column for blocking a diagonal forward", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == [4]
+      assert StatusCheck.get_block_cols(board, player, avail_cols) == 4
     end
 
     @tag :setup_board_full
@@ -63,14 +63,14 @@ defmodule ConnectFour.StatusCheckTest do
 
     @tag :setup_board_vert
     test "returns correct column required for blocking vertically", %{game_state: game_state} do
-      assert StatusCheck.get_block_cols(game_state) == [1]
+      assert StatusCheck.get_block_cols(game_state) == 1
     end
 
     @tag :setup_board_lat
     test "returns multiple columns for blocking when multiple ways to win", %{game_state: game_state} do
       result = StatusCheck.get_block_cols(game_state)
 
-      assert result == [2, 6] || result == [6, 2]
+      assert result == 2 || result == 6
     end
   end
 
