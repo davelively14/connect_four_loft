@@ -133,7 +133,8 @@ defmodule ConnectFour.StatusCheck do
 
     this_score =
       (lateral_chain_length(my_board, loc) - lateral_chain_length(opp_board, loc)) +
-      (check_vertical(my_board, loc, :max) - check_vertical(opp_board, loc, :max))
+      (check_vertical(my_board, loc, :max) - check_vertical(opp_board, loc, :max)) +
+      (diag_back_chain_length(my_board, loc) - diag_back_chain_length(opp_board, loc))
 
     score(game_state, {x, y + 1}, tail, tallied_score + this_score)
   end
@@ -142,8 +143,12 @@ defmodule ConnectFour.StatusCheck do
     check_left(1, player_board, {x - 1, y}) |> check_right(player_board, {x + 1, y}) == 4
   end
 
-  def lateral_chain_length(player_board, {x, y}) do
-    check_left(1, player_board, {x - 1, y}, :max) |> check_right(player_board, {x + 1, y}, :max)
+  def check_diag_back(player_board, {x, y}) do
+    check_up_left(1, player_board, {x - 1, y + 1}) |> check_down_right(player_board, {x + 1, y - 1}) == 4
+  end
+
+  def check_diag_fwd(player_board, {x, y}) do
+    check_up_right(1, player_board, {x + 1, y + 1}) |> check_down_left(player_board, {x - 1, y - 1}) == 4
   end
 
   def check_vertical(player_board, {x, y}), do: check_vertical(1, player_board, {x, y - 1}, 4)
@@ -160,12 +165,12 @@ defmodule ConnectFour.StatusCheck do
     end
   end
 
-  def check_diag_back(player_board, {x, y}) do
-    check_up_left(1, player_board, {x - 1, y + 1}) |> check_down_right(player_board, {x + 1, y - 1}) == 4
+  def lateral_chain_length(player_board, {x, y}) do
+    check_left(1, player_board, {x - 1, y}, :max) |> check_right(player_board, {x + 1, y}, :max)
   end
 
-  def check_diag_fwd(player_board, {x, y}) do
-    check_up_right(1, player_board, {x + 1, y + 1}) |> check_down_left(player_board, {x - 1, y - 1}) == 4
+  def diag_back_chain_length(player_board, {x, y}) do
+    check_up_left(1, player_board, {x - 1, y + 1}, :max) |> check_down_right(player_board, {x + 1, y - 1}, :max)
   end
 
   defp check_left(streak, player_board, loc), do: check_left(streak, player_board, loc, 4)
@@ -188,19 +193,21 @@ defmodule ConnectFour.StatusCheck do
     end
   end
 
-  defp check_up_left(4, _, _), do: 4
-  defp check_up_left(streak, player_board, loc = {x, y}) do
+  defp check_up_left(streak, player_board, loc), do: check_up_left(streak, player_board, loc, 4)
+  defp check_up_left(streak, _, _, max) when streak == max, do: streak
+  defp check_up_left(streak, player_board, loc = {x, y}, max) do
     if MapSet.member?(player_board, loc) do
-      check_up_left(streak + 1, player_board, {x - 1, y + 1})
+      check_up_left(streak + 1, player_board, {x - 1, y + 1}, max)
     else
       streak
     end
   end
 
-  defp check_down_right(4, _, _), do: 4
-  defp check_down_right(streak, player_board, loc = {x, y}) do
+  defp check_down_right(streak, player_board, loc), do: check_down_right(streak, player_board, loc, 4)
+  defp check_down_right(streak, _, _, max) when streak == max, do: streak
+  defp check_down_right(streak, player_board, loc = {x, y}, max) do
     if MapSet.member?(player_board, loc) do
-      check_down_right(streak + 1, player_board, {x + 1, y - 1})
+      check_down_right(streak + 1, player_board, {x + 1, y - 1}, max)
     else
       streak
     end
