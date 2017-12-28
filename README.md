@@ -28,7 +28,7 @@ $ mix run apps/cli/lib/start_cli.exs
   - Block human user when able
   - Randomly select next move when choice available
 
-#### Level 3 (Under way)
+#### Level 3 (Complete)
 
 - Create backend
   - Build websocket API to serve data via backend
