@@ -30,7 +30,7 @@ Name | Required | Type | Notes
 *game_id* | no | integer | Can start a new game using an already existing game id.
 *difficulty* | no | string | `easy` and `hard` are supported. Default is `null`.
 
-API path pattern: `api/game?height=integer&width=integer&difficulty=:easy`
+API path pattern: `api/game?height=integer&width=integer&difficulty=easy`
 - If no difficulty is provided, the game will be treated as a two player game. You must select either `easy` or `hard` to begin a game with an AI opponent.
 - Use the `&` operator to string together params.
 - Sent via the http `POST` method.
