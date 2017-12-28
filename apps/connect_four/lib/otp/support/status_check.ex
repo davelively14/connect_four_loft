@@ -23,11 +23,11 @@ defmodule ConnectFour.StatusCheck do
     if last_play = game_state.last_play do
       get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols, [])
     else
-      []
+      nil
     end
   end
   def get_block_cols(board, player, avail_cols), do: get_block_cols(board, player, avail_cols, [])
-  defp get_block_cols(_, _, [], to_block), do: to_block
+  defp get_block_cols(_, _, [], to_block), do: if to_block == [], do: nil, else: to_block
   defp get_block_cols(board, player, [head | tail], to_block) do
     if loc = find_open(board, head) do
       if check_win_or_draw(board, player, loc) == player do
@@ -38,6 +38,11 @@ defmodule ConnectFour.StatusCheck do
     else
       get_block_cols(board, player, tail, to_block)
     end
+  end
+
+  # TODO: just scaffolding
+  def get_win_col(_game_state) do
+    nil
   end
 
   @doc """

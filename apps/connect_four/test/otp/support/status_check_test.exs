@@ -47,18 +47,18 @@ defmodule ConnectFour.StatusCheckTest do
     end
 
     @tag :setup_board_full
-    test "returns empty list if board is full", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == []
+    test "returns nil if board is full", %{board: board, player: player, avail_cols: avail_cols} do
+      refute StatusCheck.get_block_cols(board, player, avail_cols)
     end
 
-    test "returns empty list if no threat to win", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == []
+    test "returns nil if no threat to win", %{board: board, player: player, avail_cols: avail_cols} do
+      refute StatusCheck.get_block_cols(board, player, avail_cols)
     end
   end
 
   describe "get_block_cols/1" do
-    test "returns empty list if new board or no threat to win", %{game_state: game_state} do
-      assert StatusCheck.get_block_cols(game_state) == []
+    test "returns nil if new board or no threat to win", %{game_state: game_state} do
+      refute StatusCheck.get_block_cols(game_state)
     end
 
     @tag :setup_board_vert
