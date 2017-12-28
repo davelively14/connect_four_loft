@@ -20,7 +20,7 @@ defmodule ConnectFour.AITest do
       assert col >= 1 && col <= 7
     end
 
-    test "blocks user if in danger of winning", %{game_id: game_id} do
+    test "blocks opponent if in danger of losing", %{game_id: game_id} do
       setup_vert_3_block(game_id)
       assert AI.select_column(GameServer.get_game(game_id), :easy) == 1
 
@@ -36,7 +36,7 @@ defmodule ConnectFour.AITest do
       assert AI.select_column(GameServer.get_game(game_id), :hard) == 4
     end
 
-    test "blocks user if in danger of winning", %{game_id: game_id} do
+    test "blocks opponent if in danger of losing", %{game_id: game_id} do
       setup_vert_3_block(game_id)
       assert AI.select_column(GameServer.get_game(game_id), :hard) == 1
 
