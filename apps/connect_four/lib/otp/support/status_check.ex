@@ -106,17 +106,57 @@ defmodule ConnectFour.StatusCheck do
     end
   end
 
+  @doc """
+  Returns the score for playing a given location. Positive indicates a generally
+  good move, zero is neutral, and negative is in favor of the opposing player.
+
+  ## Examples
+
+      iex> score(game_state, {1, 4})
+      150
+      iex> score(game_state, {2, 2})
+      -1000
+  """
+  def score(game_state, loc) do
+    list_of_verts =
+      loc
+      |> elem(1)
+      |> Range.new(game_state.height)
+      |> Enum.to_list
+
+    score(game_state, loc, list_of_verts, 0)
+  end
+  def score(_, _, [], score), do: score
+  def score(game_state, loc = {x, y}, [_head | tail], tallied_score) do
+    my_board = game_state.board[game_state.current_player]
+    opp_board = game_state.board[game_state.last_play |> elem(1)]
+
+    this_score =
+      (lateral_chain_length(my_board, loc) - lateral_chain_length(opp_board, loc)) +
+      (check_vertical(my_board, loc, :max) - check_vertical(opp_board, loc, :max))
+
+    score(game_state, {x, y + 1}, tail, tallied_score + this_score)
+  end
+
   def check_lateral(player_board, {x, y}) do
     check_left(1, player_board, {x - 1, y}) |> check_right(player_board, {x + 1, y}) == 4
   end
 
-  def check_vertical(player_board, {x, y}), do: check_vertical(1, player_board, {x, y - 1})
-  defp check_vertical(4, _, _), do: true
-  defp check_vertical(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_vertical(streak + 1, player_board, {x, y - 1})
-    else
-      false
+  def lateral_chain_length(player_board, {x, y}) do
+    check_left(1, player_board, {x - 1, y}, :max) |> check_right(player_board, {x + 1, y}, :max)
+  end
+
+  def check_vertical(player_board, {x, y}), do: check_vertical(1, player_board, {x, y - 1}, 4)
+  def check_vertical(player_board, {x, y}, max), do: check_vertical(1, player_board, {x, y - 1}, max)
+  defp check_vertical(streak, _, _, max) when streak == max, do: true
+  defp check_vertical(streak, player_board, loc = {x, y}, max) do
+    cond do
+      MapSet.member?(player_board, loc) ->
+        check_vertical(streak + 1, player_board, {x, y - 1}, max)
+      is_integer(max) ->
+        false
+      true ->
+        streak
     end
   end
 
@@ -128,19 +168,21 @@ defmodule ConnectFour.StatusCheck do
     check_up_right(1, player_board, {x + 1, y + 1}) |> check_down_left(player_board, {x - 1, y - 1}) == 4
   end
 
-  defp check_left(4, _, _), do: 4
-  defp check_left(streak, player_board, loc = {x, y}) do
+  defp check_left(streak, player_board, loc), do: check_left(streak, player_board, loc, 4)
+  defp check_left(streak, _, _, max) when streak == max, do: streak
+  defp check_left(streak, player_board, loc = {x, y}, max) do
     if MapSet.member?(player_board, loc) do
-      check_left(streak + 1, player_board, {x - 1, y})
+      check_left(streak + 1, player_board, {x - 1, y}, max)
     else
       streak
     end
   end
 
-  defp check_right(4, _, _), do: 4
-  defp check_right(streak, player_board, loc = {x, y}) do
+  defp check_right(streak, player_board, loc), do: check_right(streak, player_board, loc, 4)
+  defp check_right(streak, _, _, max) when streak == max, do: streak
+  defp check_right(streak, player_board, loc = {x, y}, max) do
     if MapSet.member?(player_board, loc) do
-      check_right(streak + 1, player_board, {x + 1, y})
+      check_right(streak + 1, player_board, {x + 1, y}, max)
     else
       streak
     end
