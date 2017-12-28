@@ -23,39 +23,6 @@ defmodule ConnectFour.StatusCheckTest do
     {:ok, %{game_state: game_state, board: board, player: player, loc: loc, avail_cols: avail_cols, game_id: game_id}}
   end
 
-  describe "get_block_cols/3" do
-    @tag :setup_board_vert
-    test "returns correct column required for blocking vertically", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == 1
-    end
-
-    @tag :setup_board_lat
-    test "returns multiple columns for blocking when multiple ways to win", %{board: board, player: player, avail_cols: avail_cols} do
-      result = StatusCheck.get_block_cols(board, player, avail_cols)
-
-      assert result == 2 || result == 6
-    end
-
-    @tag :setup_board_diag_back
-    test "returns column for blocking a diagonal back", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == 1
-    end
-
-    @tag :setup_board_diag_fwd
-    test "returns column for blocking a diagonal forward", %{board: board, player: player, avail_cols: avail_cols} do
-      assert StatusCheck.get_block_cols(board, player, avail_cols) == 4
-    end
-
-    @tag :setup_board_full
-    test "returns nil if board is full", %{board: board, player: player, avail_cols: avail_cols} do
-      refute StatusCheck.get_block_cols(board, player, avail_cols)
-    end
-
-    test "returns nil if no threat to win", %{board: board, player: player, avail_cols: avail_cols} do
-      refute StatusCheck.get_block_cols(board, player, avail_cols)
-    end
-  end
-
   describe "get_block_cols/1" do
     test "returns nil if new board or no threat to win", %{game_state: game_state} do
       refute StatusCheck.get_block_cols(game_state)
@@ -71,6 +38,21 @@ defmodule ConnectFour.StatusCheckTest do
       result = StatusCheck.get_block_cols(game_state)
 
       assert result == 2 || result == 6
+    end
+
+    @tag :setup_board_diag_back
+    test "returns column for blocking a diagonal back", %{game_state: game_state} do
+      assert StatusCheck.get_block_cols(game_state) == 1
+    end
+
+    @tag :setup_board_diag_fwd
+    test "returns column for blocking a diagonal forward", %{game_state: game_state} do
+      assert StatusCheck.get_block_cols(game_state) == 4
+    end
+
+    @tag :setup_board_full
+    test "returns nil if board is full", %{game_state: game_state} do
+      refute StatusCheck.get_block_cols(game_state)
     end
   end
 
