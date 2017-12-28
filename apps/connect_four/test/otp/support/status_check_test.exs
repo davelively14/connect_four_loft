@@ -161,6 +161,26 @@ defmodule ConnectFour.StatusCheckTest do
     end
   end
 
+  describe "lateral_chain_length/2" do
+    @describetag :setup_board_lat_block
+
+    test "returns correct number for a given play with all right", %{board: board} do
+      assert StatusCheck.lateral_chain_length(board[:player_1], {2, 1}) == 4
+    end
+
+    test "returns correct number for a sandwich play", %{game_id: game_id} do
+      GameServer.drop_piece(game_id, 3)
+      GameServer.drop_piece(game_id, 1)
+      game_state = GameServer.get_game(game_id)
+
+      assert StatusCheck.lateral_chain_length(game_state.board[:player_1], {2, 1}) == 5
+    end
+
+    test "returns correct number for a given play with all left", %{board: board} do
+      assert StatusCheck.lateral_chain_length(board[:player_1], {6, 1}) == 4
+    end
+  end
+
   describe "check_vertical/2" do
     @describetag :setup_board_vert_block
 
@@ -172,6 +192,10 @@ defmodule ConnectFour.StatusCheckTest do
       refute StatusCheck.check_vertical(board[player], {1,3})
       refute StatusCheck.check_vertical(board[player], {2,1})
       refute StatusCheck.check_vertical(board[player], {6,6})
+    end
+
+    test "returns streak instead of true/false when a non-integer is passed", %{board: board, player: player} do
+      assert StatusCheck.check_vertical(board[player], {1,4}, :max) == 4
     end
   end
 
