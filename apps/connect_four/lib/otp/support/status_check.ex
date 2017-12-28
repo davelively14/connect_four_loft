@@ -4,46 +4,60 @@ defmodule ConnectFour.StatusCheck do
   """
 
   @doc """
-  Returns a list of columns that would produce a win for the opposing player.
-  Can either pass a valid board, player atom, and available columns list, or
-  simply pass the game_state
+  Provided game_state, will return column that would produce a win for the
+  opposing player. If no blocking move necessary, will return nil.
 
   ## Examples
 
-      iex> get_block_cols(valid_board, :opposing_player, avail_cols)
-      [1]
-      iex> get_block_cols(valid_board, :opposing_player, avail_cols)
-      []
       iex> get_block_cols(valid_game_state)
-      [1]
+      1
       iex> get_block_cols(valid_game_state)
-      []
+      nil
   """
   def get_block_cols(game_state) do
     if last_play = game_state.last_play do
-      get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols, nil)
+      get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols)
     else
       nil
     end
   end
-  def get_block_cols(board, player, avail_cols), do: get_block_cols(board, player, avail_cols, nil)
-  defp get_block_cols(_, _, [], to_block), do: to_block
-  defp get_block_cols(board, player, [head | tail], to_block) do
+  defp get_block_cols(_, _, []), do: nil
+  defp get_block_cols(board, player, [head | tail]) do
     if loc = find_open(board, head) do
       if check_win_or_draw(board, player, loc) == player do
         elem(loc, 0)
-        # get_block_cols(board, player, tail, [elem(loc, 0) | to_block])
       else
-        get_block_cols(board, player, tail, to_block)
+        get_block_cols(board, player, tail)
       end
     else
-      get_block_cols(board, player, tail, to_block)
+      get_block_cols(board, player, tail)
     end
   end
 
-  # TODO: just scaffolding
-  def get_win_col(_game_state) do
-    nil
+  @doc """
+  Provided a valid game state, will determine if a move is available that would
+  win the game for the current player and return the column necessary to win.
+  Otherwise, returns nil.
+
+  ## Examples
+
+      iex> get_win_col(valid_game_state)
+      3
+      iex> get_win_col(valid_game_state)
+      nil
+  """
+  def get_win_col(game_state), do: get_win_col(game_state.board, game_state.current_player, game_state.avail_cols)
+  defp get_win_col(_, _, []), do: nil
+  defp get_win_col(board, player, [head | tail]) do
+    if loc = find_open(board, head) do
+      if check_win_or_draw(board, player, loc) == player do
+        elem(loc, 0)
+      else
+        get_win_col(board, player, tail)
+      end
+    else
+      get_win_col(board, player, tail)
+    end
   end
 
   @doc """
