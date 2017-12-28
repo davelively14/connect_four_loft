@@ -1,5 +1,5 @@
 import game from '../../../lib/connect_four_backend_web/static/js/reducers/game';
-import * as helpers from '../helpers/index';
+import * as helpers from '../test_helpers/helpers';
 
 const initialState = {
   id: undefined

@@ -1,5 +1,5 @@
 import * as actions from '../../../lib/connect_four_backend_web/static/js/actions/index';
-import { buildGameState, buildPlayerInfo } from '../helpers/index';
+import { buildGameState, buildPlayerInfo } from '../test_helpers/helpers';
 
 describe('index', () => {
   describe('types', () => {
