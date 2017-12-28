@@ -84,6 +84,28 @@ defmodule ConnectFour.StatusCheck do
     end
   end
 
+  @doc """
+  Returns the next avail location for a given column. If the column is full,
+  will return nil.
+
+  ## Examples
+
+      iex> find_open(valid_board, 1)
+      {1, 3}
+      iex> find_open(valid_board, 3)
+      nil
+  """
+  def find_open(board, col), do: find_open(MapSet.to_list(board[:free]), col, nil)
+  defp find_open([], _, lowest), do: lowest
+  defp find_open([head | tail], col, lowest) do
+    cond do
+      elem(head, 0) == col && (lowest && elem(head, 1) < elem(lowest, 1) || !lowest) ->
+        find_open(tail, col, head)
+      true ->
+        find_open(tail, col, lowest)
+    end
+  end
+
   def check_lateral(player_board, {x, y}) do
     check_left(1, player_board, {x - 1, y}) |> check_right(player_board, {x + 1, y}) == 4
   end
@@ -157,17 +179,6 @@ defmodule ConnectFour.StatusCheck do
       check_down_left(streak + 1, player_board, {x - 1, y - 1})
     else
       streak
-    end
-  end
-
-  def find_open(board, col), do: find_open(MapSet.to_list(board[:free]), col, nil)
-  defp find_open([], _, lowest), do: lowest
-  defp find_open([head | tail], col, lowest) do
-    cond do
-      elem(head, 0) == col && (lowest && elem(head, 1) < elem(lowest, 1) || !lowest) ->
-        find_open(tail, col, head)
-      true ->
-        find_open(tail, col, lowest)
     end
   end
 end
