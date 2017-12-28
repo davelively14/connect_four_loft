@@ -14,6 +14,7 @@ class NewGameCPUForm extends Component {
         <Field name="difficulty" component="select">
           <option></option>
           <option value="easy">Easy</option>
+          <option value="hard">Hard</option>
         </Field>
         <br></br>
         <br></br>
