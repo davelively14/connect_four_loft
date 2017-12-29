@@ -213,6 +213,18 @@ defmodule ConnectFour.StatusCheckTest do
     end
   end
 
+  describe "diag_back_chain_length/2" do
+    @describetag :setup_board_diag_back_block
+
+    test "returns correct number for a given play", %{board: board} do
+      assert StatusCheck.diag_back_chain_length(board[:player_1], {1, 4}) == 4
+    end
+
+    test "returns correct number for a sandwich play", %{board: board} do
+      assert StatusCheck.diag_back_chain_length(board[:player_1], {2, 3}) == 3
+    end
+  end
+
   describe "check_diag_fwd/2" do
     @describetag :setup_board_diag_fwd_block
 
