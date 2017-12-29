@@ -27,7 +27,7 @@ class Landing extends Component {
           <p className="lead">My test project for <a href="https://salesloft.com/" target="_blank">SalesLoft</a></p>
           <div className="row">
             <Link to="new-game">
-              <button className="btn btn-primary">New Game</button>
+              <button className="btn btn-primary">New 2P Game</button>
             </Link>
             &nbsp;
             <Link to="new-game-cpu">
