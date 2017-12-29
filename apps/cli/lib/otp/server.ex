@@ -18,7 +18,8 @@ defmodule CLI.Server do
     IO.puts "Main Menu"
     IO.puts "----------"
     IO.puts "1 - Start new game for two human players"
-    IO.puts "2 - Start new game with easy CPU opponent"
+    IO.puts "2 - Start new game vs easy CPU opponent"
+    IO.puts "3 - Start new game vs hard CPU opponent"
     IO.puts "Q - Quit the game at any point"
     IO.puts "----------"
     selection =
@@ -26,7 +27,7 @@ defmodule CLI.Server do
 
     selection = selection |> sanitize_selection
 
-    options = ["1", "2", "Q"]
+    options = ["1", "2", "3", "Q"]
 
     if is_valid?(selection, options) do
       case selection do
@@ -36,6 +37,8 @@ defmodule CLI.Server do
           select({:new_game, 2})
         "2" ->
           select({:new_game, :easy})
+        "3" ->
+          select({:new_game, :hard})
         _ ->
           select(:main_menu)
       end
@@ -127,6 +130,9 @@ defmodule CLI.Server do
               {:error, message} ->
                 IO.puts "#{message}\n\n"
                 select({:play_game, difficulty, state})
+              {:ok, winner} ->
+                print_result(state[winner])
+                select(:main_menu)
               _ ->
                 IO.puts "Unknown error, restarting"
                 select(:main_menu)
