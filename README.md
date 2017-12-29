@@ -6,7 +6,7 @@ Connect Four app for SalesLoft [Engineering Offline Exercise v2](https://docs.go
 
 I opted to utilize Elixir's umbrella project capabilities in order to manage the complexities of what essentially are three different applications: a command line interface, a web interface, and the game itself. Umbrella projects are an effective method for combining Elixir applications* that share common dependencies. While these applications are not completely decoupled, they are so loosely coupled that they can easily be split out into their standalone applications.
 
-<h4><small>* Elixir inherited the term 'application' from erlang. I realize that these 'applications' function more like what is commonly referred to as a library.</small></h4>
+<h5><small>* Elixir inherited the term 'application' from erlang. I realize that these 'applications' function more like what is commonly referred to as a library.</small></h5>
 
 ### The Game
 
