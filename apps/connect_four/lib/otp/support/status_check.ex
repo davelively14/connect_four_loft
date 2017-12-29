@@ -133,6 +133,8 @@ defmodule ConnectFour.StatusCheck do
     opp_board = game_state.board[opp]
 
     cond do
+      head == 1 && check_sandwich(opp_board, game_state.board.free, loc) ->
+        1000
       rem(head, 2) == 0 && check_win_or_draw(game_state.board, opp, loc) ->
         div(-2000, head)
       rem(head, 2) == 0 && check_win_or_draw(game_state.board, player, loc) ->
@@ -153,6 +155,17 @@ defmodule ConnectFour.StatusCheck do
         score(game_state, {x, y + 1}, tail, tallied_score + this_score)
       true ->
         :error
+    end
+  end
+
+  def check_sandwich(opp_board, free, {x, y}) do
+    left = check_left(0, opp_board, {x - 1, y}, :max)
+    right = check_right(0, opp_board, {x + 1, y}, :max)
+
+    if left + right > 1 && MapSet.member?(free, {x - left - 1, y}) && MapSet.member?(free, {x + right + 1, y}) do
+      true
+    else
+      false
     end
   end
 
