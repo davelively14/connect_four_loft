@@ -117,26 +117,43 @@ defmodule ConnectFour.StatusCheck do
       iex> score(game_state, {2, 2})
       -1000
   """
-  def score(game_state, loc) do
-    list_of_verts =
-      loc
-      |> elem(1)
-      |> Range.new(game_state.height)
+  def score(game_state, loc = {_x, y}) do
+    iterations =
+      Range.new(1, game_state.height - y + 1)
       |> Enum.to_list
 
-    score(game_state, loc, list_of_verts, 0)
+    score(game_state, loc, iterations, 0)
   end
-  def score(_, _, [], score), do: score
-  def score(game_state, loc = {x, y}, [_head | tail], tallied_score) do
-    my_board = game_state.board[game_state.current_player]
-    opp_board = game_state.board[game_state.last_play |> elem(1)]
+  defp score(_, _, [], score), do: score
+  defp score(game_state, loc = {x, y}, [head | tail], tallied_score) do
+    player = game_state.current_player
+    opp = elem(game_state.last_play, 0)
 
-    this_score =
-      (lateral_chain_length(my_board, loc) - lateral_chain_length(opp_board, loc)) +
-      (check_vertical(my_board, loc, :max) - check_vertical(opp_board, loc, :max)) +
-      (diag_back_chain_length(my_board, loc) - diag_back_chain_length(opp_board, loc))
+    player_board = game_state.board[player]
+    opp_board = game_state.board[opp]
 
-    score(game_state, {x, y + 1}, tail, tallied_score + this_score)
+    cond do
+      rem(head, 2) == 0 && check_win_or_draw(game_state.board, opp, loc) ->
+        div(-2000, head)
+      rem(head, 2) == 0 && check_win_or_draw(game_state.board, player, loc) ->
+        div(-1000, head)
+      rem(head, 2) == 0 ->
+        this_score =
+          (lateral_chain_length(player_board, loc) - lateral_chain_length(opp_board, loc) * 2) +
+          (check_vertical(player_board, loc, :max) - check_vertical(opp_board, loc, :max) * 2) +
+          (diag_back_chain_length(player_board, loc) - diag_back_chain_length(opp_board, loc) * 2)
+
+        score(game_state, {x, y + 1}, tail, tallied_score + this_score)
+      rem(head, 2) == 1 ->
+        this_score =
+          (lateral_chain_length(player_board, loc) * 2 - lateral_chain_length(opp_board, loc)) +
+          (check_vertical(player_board, loc, :max) * 2 - check_vertical(opp_board, loc, :max)) +
+          (diag_back_chain_length(player_board, loc) * 2 - diag_back_chain_length(opp_board, loc))
+
+        score(game_state, {x, y + 1}, tail, tallied_score + this_score)
+      true ->
+        :error
+    end
   end
 
   def check_lateral(player_board, {x, y}) do
@@ -149,10 +166,6 @@ defmodule ConnectFour.StatusCheck do
 
   def check_diag_fwd(player_board, {x, y}) do
     check_up_right(1, player_board, {x + 1, y + 1}) |> check_down_left(player_board, {x - 1, y - 1}) == 4
-  end
-
-  def diag_fwd_chain_length(player_board, {x, y}) do
-    check_up_right(1, player_board, {x + 1, y + 1}, :max) |> check_down_left(player_board, {x - 1, y - 1}, :max)
   end
 
   def check_vertical(player_board, {x, y}), do: check_vertical(1, player_board, {x, y - 1}, 4)
@@ -175,6 +188,10 @@ defmodule ConnectFour.StatusCheck do
 
   def diag_back_chain_length(player_board, {x, y}) do
     check_up_left(1, player_board, {x - 1, y + 1}, :max) |> check_down_right(player_board, {x + 1, y - 1}, :max)
+  end
+
+  def diag_fwd_chain_length(player_board, {x, y}) do
+    check_up_right(1, player_board, {x + 1, y + 1}, :max) |> check_down_left(player_board, {x - 1, y - 1}, :max)
   end
 
   defp check_left(streak, player_board, loc), do: check_left(streak, player_board, loc, 4)
