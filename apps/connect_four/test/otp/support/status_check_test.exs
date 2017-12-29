@@ -15,6 +15,8 @@ defmodule ConnectFour.StatusCheckTest do
       context[:setup_board_diag_back_win] -> setup_board_diag_back_win(game_id)
       context[:setup_board_diag_fwd_block] -> setup_board_diag_fwd_block(game_id)
       context[:setup_board_diag_fwd_win] -> setup_board_diag_fwd_win(game_id)
+      context[:setup_bad_row_2] -> setup_bad_row_2(game_id)
+      context[:dont_screw_up_row_2] -> dont_screw_up_row_2(game_id)
       context[:setup_board_full] -> setup_board_full(game_id)
       true -> nil
     end
@@ -199,6 +201,18 @@ defmodule ConnectFour.StatusCheckTest do
     end
   end
 
+  describe "score/2" do
+    @tag :setup_bad_row_2
+    test "returns -1000 when playing a column would give opponent an immediate win", %{game_state: game_state} do
+      assert StatusCheck.score(game_state, {2, 1}) == -1_000
+    end
+
+    @tag :dont_screw_up_row_2
+    test "returns -500 when playing a column would allow an opponent to block an immediate win", %{game_state: game_state} do
+      assert StatusCheck.score(game_state, {2, 1}) == -500
+    end
+  end
+
   describe "check_diag_back/2" do
     @describetag :setup_board_diag_back_block
 
@@ -354,5 +368,29 @@ defmodule ConnectFour.StatusCheckTest do
     for _ <- 1..6 do
       GameServer.drop_piece(game_id, 7)
     end
+  end
+
+  defp setup_bad_row_2(game_id) do
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 5)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 5)
+    GameServer.drop_piece(game_id, 4)
+  end
+
+  defp dont_screw_up_row_2(game_id) do
+    GameServer.drop_piece(game_id, 7)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 1)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 3)
+    GameServer.drop_piece(game_id, 5)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 5)
+    GameServer.drop_piece(game_id, 4)
+    GameServer.drop_piece(game_id, 7)
   end
 end
