@@ -237,6 +237,18 @@ defmodule ConnectFour.StatusCheckTest do
     end
   end
 
+  describe "diag_fwd_chain_length/2" do
+    @describetag :setup_board_diag_fwd_block
+
+    test "returns correct number for a given play", %{board: board} do
+      assert StatusCheck.diag_fwd_chain_length(board[:player_1], {4,4}) == 4
+    end
+
+    test "returns correct number for a sandwich play", %{board: board} do
+      assert StatusCheck.diag_fwd_chain_length(board[:player_1], {3,3}) == 3
+    end
+  end
+
   describe "find_open/2" do
     test "returns correct column on an empty board", %{board: board} do
       assert StatusCheck.find_open(board, 1) == {1, 1}
