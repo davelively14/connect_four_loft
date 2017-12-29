@@ -55,6 +55,28 @@ defmodule ConnectFour.AITest do
       setup_lat_3_win(game_id)
       assert AI.select_column(GameServer.get_game(game_id), :hard) == 4
     end
+
+    test "plays a column", %{game_id: game_id} do
+      GameServer.drop_piece(game_id, 4)
+      assert is_integer(AI.select_column(GameServer.get_game(game_id), :hard))
+    end
+
+    test "doesn't get trapped easy lateral", %{game_id: game_id} do
+      GameServer.drop_piece(game_id, 4)
+      GameServer.drop_piece(game_id, 4)
+      GameServer.drop_piece(game_id, 3)
+      col = AI.select_column(GameServer.get_game(game_id), :hard)
+
+      assert col == 2 || col == 5
+    end
+
+    test "doesn't get trapped in a complex lateral", %{game_id: game_id} do
+      GameServer.drop_piece(game_id, 4)
+      GameServer.drop_piece(game_id, 4)
+      GameServer.drop_piece(game_id, 2)
+
+      assert AI.select_column(GameServer.get_game(game_id), :hard) == 3
+    end
   end
 
   #####################
