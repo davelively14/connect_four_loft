@@ -43,7 +43,7 @@ class ColumnSelector extends Component {
       if (availCols.includes(x)) {
         buttonMarkup.push(
           <td key={'col:' + x} className="text-center">
-            <button onClick={this.drop.bind(this, x)} className="btn btn-primary" key={'select-col:' + x}>{x}</button>
+            <button onClick={this.drop.bind(this, x)} className="btn btn-primary" key={'select-col:' + x}>Add</button>
           </td>
         );
       } else {
