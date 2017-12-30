@@ -24,6 +24,24 @@ class Board extends Component {
 
   }
 
+  renderHeader() {
+    const { width } = this.props;
+    let colWidth = 100 / width;
+    let tableHeader = [];
+
+    for (var col = 1; col <= width; col++) {
+      tableHeader.push(
+        <th width={colWidth + '%'} className='text-center' key={'colHeader:' + col}>{col}</th>
+      );
+    }
+
+    return (
+      <tr key='tableHeaderRow'>
+        {tableHeader}
+      </tr>
+    );
+  }
+
   renderBoard() {
     let {board, width, height} = this.props;
     let tableBody = [];
@@ -39,6 +57,9 @@ class Board extends Component {
     return(
       <div>
         <table className="table table-bordered">
+          <thead>
+            {this.renderHeader()}
+          </thead>
           <tbody>
             {this.renderBoard()}
           </tbody>
