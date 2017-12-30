@@ -16,7 +16,7 @@ I understand this is just a small portion of working on a team, but I believe I 
 
 I opted to utilize Elixir's umbrella project capabilities in order to manage the complexities of what essentially are three different applications: a command line interface, a web interface, and the game itself. Umbrella projects are an effective method for combining Elixir applications* that share common dependencies. While these applications are not completely decoupled, they are so loosely coupled that they can easily be split out into their standalone applications.
 
-*<small> \*Elixir inherited the term 'application' from erlang. I realize that these 'applications' function more like what is commonly referred to as a library.</small>*
+*<sup><sub> \*Elixir inherited the term 'application' from erlang. I realize that these 'applications' function more like what is commonly referred to as a library.</sup></sub>*
 
 ## Implementation
 
