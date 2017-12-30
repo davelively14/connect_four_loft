@@ -1,5 +1,7 @@
 # Connect Four for SalesLoft
 
+<img src="https://image.flaticon.com/icons/png/128/12/12195.png" width="32"> &nbsp;&nbsp;<a href="https://secure-temple-90358.herokuapp.com/" target="\_blank">View Demo</a>
+
 Connect Four app for SalesLoft [Engineering Offline Exercise v2](https://docs.google.com/document/d/1ChozkkouQrRESGlvZYEM4sNAyks5mK-cAODGSKvgYjM/edit). This is a version of the popular [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) game written in the Elixir language.
 
 ## Approach
@@ -47,6 +49,8 @@ For the frontend, I used a simple ReactJS with a Redux store that interacts with
 ## Deployed Demo
 
 <img src="https://image.flaticon.com/icons/png/128/12/12195.png" width="32"> &nbsp;&nbsp;<a href="https://secure-temple-90358.herokuapp.com/" target="\_blank">View Demo</a>
+
+I deployed this project to my Heroku account. It took a few iterations to get the configs right, as this was the first time I had deployed an umbrella app to Heroku.
 
 ## Initial Notes
 
