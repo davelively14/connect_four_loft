@@ -4,9 +4,21 @@ Connect Four app for SalesLoft [Engineering Offline Exercise v2](https://docs.go
 
 ## Approach
 
+### Team
+
+I recognize that having not worked professionally on a development team is a weakness on my resume. In order to simulate working on a team, I managed this projects via GitHub. I created milestones for each level (1-3 and Boss), issues for key features in each milestone, submitted pull requests for branches that fixed those issues, and then merged them from GitHub to close the issues.
+
+Additionally, I attempted to maintain consistent convention across the board. Semicolons (JS), single quotes (JS), spacing, line breaks, directory structure, etc. were all maintained throughout.
+
+I understand this is just a small portion of working on a team, but I believe I simulated it as much as one can when working independently.
+
+### Architecture
+
 I opted to utilize Elixir's umbrella project capabilities in order to manage the complexities of what essentially are three different applications: a command line interface, a web interface, and the game itself. Umbrella projects are an effective method for combining Elixir applications* that share common dependencies. While these applications are not completely decoupled, they are so loosely coupled that they can easily be split out into their standalone applications.
 
-<h5><small>* Elixir inherited the term 'application' from erlang. I realize that these 'applications' function more like what is commonly referred to as a library.</small></h5>
+<small>* Elixir inherited the term 'application' from erlang. I realize that these 'applications' function more like what is commonly referred to as a library.</small>
+
+## Implementation
 
 ### The Game
 
@@ -36,24 +48,26 @@ For the frontend, I used a simple ReactJS with a Redux store that interacts with
 
 <img src="https://image.flaticon.com/icons/png/128/12/12195.png" width="32"> &nbsp;&nbsp;<a href="https://secure-temple-90358.herokuapp.com/" target="\_blank">View Demo</a>
 
-## Implementation
+## Initial Notes
 
-#### Level 1 (Complete)
+These are the notes I used to layout my approach. Ultimately, each of these points became issues on the GitHub repo.
+
+### Level 1 (Complete)
 
 - Create game mechanics
-  - Store state via GenServer: board, current_player,
+  - Store state via GenServer
   - Respond to input in accordance with game rules
   - Check for wins and draw
 - Create user interface for a two player game
   - CLI for a two human player version
 
-#### Level 2 (Complete)
+### Level 2 (Complete)
 
 - Create AI
   - Block human user when able
   - Randomly select next move when choice available
 
-#### Level 3 (Complete)
+### Level 3 (Complete)
 
 - Create backend
   - Build websocket API to serve data via backend
@@ -62,7 +76,7 @@ For the frontend, I used a simple ReactJS with a Redux store that interacts with
 - Deploy
   - Deploy to Heroku
 
-#### Boss (Complete)
+### Boss (Complete)
 
 - Improve AI
   - Uses look-ahead strategy
