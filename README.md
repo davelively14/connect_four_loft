@@ -12,7 +12,7 @@ I recognize that having not worked professionally on a development team is a wea
 
 Additionally, I attempted to maintain consistent convention across the board. Semicolons (JS), single quotes (JS), spacing, line breaks, directory structure, etc. were all maintained throughout.
 
-I understand this is just a small portion of working on a team, but I believe I simulated it as much as one can when working independently.
+I understand this is just a small portion of working on a team, but I wanted to make an effort to simulate doing so whenever able.
 
 ### Architecture
 
