@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import { browserHistory } from 'react-router';
 
 import { resetGame } from '../helpers/api';
+import PlayingBoard from './board/playing_board';
 
 const mapStateToProps = function(state) {
   return {
@@ -63,6 +64,9 @@ class GameOver extends Component {
       <div>
         <h1>Game Over</h1>
         <h3>{this.renderWinner()}</h3>
+        <table className="table table-bordered">
+          <PlayingBoard />
+        </table>
         <div className="text-center">
           <Link to="/" className="btn btn-primary">Quit</Link>&nbsp;
           <Link to={this.props.newGamePath} className="btn btn-primary">New Game</Link>&nbsp;

@@ -4,12 +4,11 @@ import { Link } from 'react-router';
 
 import Row from './row';
 import ColumnSelector from './column_selector';
+import PlayingBoard from './playing_board';
 
 const mapStateToProps = function(state) {
   if (state.game.id) {
     return {
-      board: state.game.board,
-      height: state.game.height,
       width: state.game.width
     };
   } else {
@@ -20,10 +19,6 @@ const mapStateToProps = function(state) {
 };
 
 class Board extends Component {
-  componentWillMount() {
-
-  }
-
   renderHeader() {
     const { width } = this.props;
     let colWidth = 100 / width;
@@ -42,17 +37,6 @@ class Board extends Component {
     );
   }
 
-  renderBoard() {
-    let {board, width, height} = this.props;
-    let tableBody = [];
-
-    for (var row = height; row > 0; row--) {
-      tableBody.push(Row(row, width, board));
-    }
-
-    return tableBody;
-  }
-
   render() {
     return(
       <div>
@@ -60,9 +44,7 @@ class Board extends Component {
           <thead>
             {this.renderHeader()}
           </thead>
-          <tbody>
-            {this.renderBoard()}
-          </tbody>
+          <PlayingBoard />
           <ColumnSelector />
         </table>
         <div className="text-center">
