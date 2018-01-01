@@ -118,6 +118,10 @@ defmodule ConnectFour.StatusCheck do
       -1000
   """
   def score(game_state, loc = {_x, y}) do
+
+    # Creates a list that be the length of available rows in a column. If the
+    # location we're assessing is column 1, row 3 for a standard 6 row game
+    # board, then the resulting list would be [1, 2, 3, 4]
     iterations =
       Range.new(1, game_state.height - y + 1)
       |> Enum.to_list
@@ -133,12 +137,31 @@ defmodule ConnectFour.StatusCheck do
     opp_board = game_state.board[opp]
 
     cond do
+      # Look ahead to prevent situations where an opponent has two ways to
+      # win laterally. Example, O would need to play either col 3 and 6.
+      # O - - X X - -
       head == 1 && check_sandwich(opp_board, game_state.board.free, loc) ->
         1000
+
+      # Negatively scores situations where you might setup an opponent win
+      # Example, columns 2 and 6 would not be a viable play for player O:
+      # O - X X X - -
+      # O - O X X - -
       rem(head, 2) == 0 && check_win_or_draw(game_state.board, opp, loc) ->
         div(-2000, head)
+
+      # Negatively scores situations where you eliminate a chance to win.
+      # Example, if player O plays cols 2 or 6, X would block:
+      # X - O O O - -
+      # X - O X X - -
       rem(head, 2) == 0 && check_win_or_draw(game_state.board, player, loc) ->
         div(-1000, head)
+
+      # Generic scoring methods. These numbers will generally be very low and
+      # only be relevant if none of the the earlier conditions fire for other
+      # cells in the column. The first function is for even distance from the
+      # first free cell, the second function for odd. Generally speaking, odd
+      # favors the AI and even the opponent.
       rem(head, 2) == 0 ->
         this_score =
           (lateral_chain_length(player_board, loc) - lateral_chain_length(opp_board, loc) * 2) +
