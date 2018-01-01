@@ -11,6 +11,7 @@ const mapStateToProps = function(state) {
   return {
     gameId: state.game.id,
     finished: state.game.finished,
+    newGamePath: state.game.difficulty ? '/new-game-cpu' : '/new-game',
     players: {
       player_1: state.game.player_1,
       player_2: state.game.player_2
@@ -64,7 +65,7 @@ class GameOver extends Component {
         <h3>{this.renderWinner()}</h3>
         <div className="text-center">
           <Link to="/" className="btn btn-primary">Quit</Link>&nbsp;
-          <Link to="/new-game" className="btn btn-primary">New Game</Link>&nbsp;
+          <Link to={this.props.newGamePath} className="btn btn-primary">New Game</Link>&nbsp;
           <button onClick={this.resetGame.bind(this)} className="btn btn-primary">Rematch</button>
         </div>
       </div>
