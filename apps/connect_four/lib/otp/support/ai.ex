@@ -34,6 +34,8 @@ defmodule ConnectFour.AI do
   # Private Functions #
   #####################
 
+  # Scores each column via the StatusCheck.score method and returns the column
+  # with the highest score.
   defp best_col(game_state), do: best_col(game_state.avail_cols, game_state, nil)
   defp best_col([], _, {col, _}), do: col
   defp best_col([head | tail], game_state = %{board: board}, best) do
