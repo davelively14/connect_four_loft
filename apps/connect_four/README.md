@@ -19,6 +19,7 @@ Once started, the API will be available to the node via the `ConnectFour.GameSer
 * [new_game](#new-game)
 * [get_game](#get-game)
 * [get_state](#get-state)
+* [drop_piece](#drop-piece)
 
 ### <a name="new-game"></a>new_game
 
@@ -111,12 +112,33 @@ iex> GameState.get_state()
 %{next_id: 13, ets: :games}
 ```
 
+### <a name="drop-piece"></a>drop_piece
 
-- `GameServer.drop_piece/2`: Drops a piece for a given game on the given column.
-  - Call: `GameServer.drop_piece(game_id, col)`
-    - `game_id`: integer (required), the id for the game
-    - `col`: integer (required), the column to be played
-  - Returns: `:ok` or `{:error, reason}`
+Drops a piece for a given game on the given column.
+
+Name | Required | Type | Notes
+--- | :---: | :---: | ---
+*game_id* | yes | integer | The id of the game being played.
+*col* | yes | integer | The column where the piece is to be dropped.
+
+Call:
+```elixir
+GameState.drop_piece(425, 4)
+```
+
+Returns one of:
+- `:ok`: Indicates the play was valid and recorded.
+- `{:error, reason}`: If error, will return a tuple with `:error` and a string with the reason for the error.
+
+#### Example:
+
+```
+iex> GameState.drop_piece(123, 4)
+:ok
+iex> GameState.drop_piece(124, 4)
+{:error, "Game does not exist"}
+```
+
 - `GameServer.reset_game/1`: Resets the game to it's original configuration
   - Call: `GameServer.reset_game(game_id)`
     - `game_id`: integer (required), the id for the game
