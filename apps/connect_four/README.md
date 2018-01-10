@@ -40,9 +40,9 @@ GameState.new_game()
 GameState.new_game(%{height: 10, width: 10, difficulty: :easy})
 ```
 
-Returns a tuple:
-- `{:ok, game_id}`: If valid, will return a tuple with `:ok` and a game_id in integer format.
-- `{:error, reason}`: If error, will return a tuple with `:error` and a string with the reason for the error.
+Returns one of the following:
+- `{:ok, game_id}`: If valid, will return a tuple with `:ok` and a game id in integer format.
+- `{:error, reason}`: If error, will return a tuple with `:error` and a string representing the reason for the error.
 
 #### Example:
 
@@ -56,6 +56,10 @@ iex> GameState.new_game()
 ### <a name="get-game"></a>get_game
 
 Provided a valid `game_id`, returns the state of the given game.
+
+Name | Required | Type | Notes
+--- | :---: | :---: | ---
+*game_id* | yes | integer | The id of the game being played.
 
 Call:
 ```elixir
@@ -76,7 +80,7 @@ With a valid id, returns the game state as a map with the following keys
 - `difficulty`: atom representing level of difficulty. Either `:easy` or `:hard`.
 
 Otherwise, returns an error:
-- `{:error, reason}`
+- `{:error, reason}`: tuple with `:error` and a string representing the reason for the error.
 
 #### Example:
 
@@ -128,7 +132,7 @@ GameState.drop_piece(425, 4)
 
 Returns one of:
 - `:ok`: Indicates the play was valid and recorded.
-- `{:error, reason}`: If error, will return a tuple with `:error` and a string with the reason for the error.
+- `{:error, reason}`: If error, will return a tuple with `:error` and a string representing the reason for the error.
 
 #### Example:
 
