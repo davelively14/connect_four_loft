@@ -1,5 +1,6 @@
 defmodule ConnectFour.GameServer do
   use GenServer
+  alias ConnectFour.StatusCheck
 
   @default_height 6
   @default_width 7
@@ -216,7 +217,7 @@ defmodule ConnectFour.GameServer do
       state,
       %{
         board: new_board,
-        finished: check_win_or_draw(state.current_player, new_free, new_player_board, loc),
+        finished: StatusCheck.check_win_or_draw(new_board, state.current_player, loc),
         avail_cols: new_avail_cols,
         last_play: {state.current_player, loc},
         current_player: advance_player(state.current_player)
@@ -244,97 +245,6 @@ defmodule ConnectFour.GameServer do
         false
       true ->
         true
-    end
-  end
-
-  ################
-  # Check Status #
-  ################
-
-  defp check_win_or_draw(player, free, player_board, loc) do
-    cond do
-      check_lateral(player_board, loc) -> player
-      check_vertical(player_board, loc) -> player
-      check_diag_back(player_board, loc) -> player
-      check_diag_fwd(player_board, loc) -> player
-      MapSet.size(free) == 0 -> :draw
-      true -> nil
-    end
-  end
-
-  def check_lateral(player_board, {x, y}) do
-    check_left(1, player_board, {x - 1, y}) |> check_right(player_board, {x + 1, y}) == 4
-  end
-
-  def check_vertical(player_board, {x, y}), do: check_vertical(1, player_board, {x, y - 1})
-  defp check_vertical(4, _, _), do: true
-  defp check_vertical(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_vertical(streak + 1, player_board, {x, y - 1})
-    else
-      false
-    end
-  end
-
-  def check_diag_back(player_board, {x, y}) do
-    check_up_left(1, player_board, {x - 1, y + 1}) |> check_down_right(player_board, {x + 1, y - 1}) == 4
-  end
-
-  def check_diag_fwd(player_board, {x, y}) do
-    check_up_right(1, player_board, {x + 1, y + 1}) |> check_down_left(player_board, {x - 1, y - 1}) == 4
-  end
-
-  defp check_left(4, _, _), do: 4
-  defp check_left(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_left(streak + 1, player_board, {x - 1, y})
-    else
-      streak
-    end
-  end
-
-  defp check_right(4, _, _), do: 4
-  defp check_right(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_right(streak + 1, player_board, {x + 1, y})
-    else
-      streak
-    end
-  end
-
-  defp check_up_left(4, _, _), do: 4
-  defp check_up_left(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_up_left(streak + 1, player_board, {x - 1, y + 1})
-    else
-      streak
-    end
-  end
-
-  defp check_down_right(4, _, _), do: 4
-  defp check_down_right(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_down_right(streak + 1, player_board, {x + 1, y - 1})
-    else
-      streak
-    end
-  end
-
-  defp check_up_right(4, _, _), do: 4
-  defp check_up_right(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_up_right(streak + 1, player_board, {x + 1, y + 1})
-    else
-      streak
-    end
-  end
-
-  defp check_down_left(4, _, _), do: 4
-  defp check_down_left(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_down_left(streak + 1, player_board, {x - 1, y - 1})
-    else
-      streak
     end
   end
 
