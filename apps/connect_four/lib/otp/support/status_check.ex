@@ -9,28 +9,28 @@ defmodule ConnectFour.StatusCheck do
 
   ## Examples
 
-      iex> get_block_cols(valid_game_state)
+      iex> get_block_col(valid_game_state)
       1
-      iex> get_block_cols(valid_game_state)
+      iex> get_block_col(valid_game_state)
       nil
   """
-  def get_block_cols(game_state) do
+  def get_block_col(game_state) do
     if last_play = game_state.last_play do
-      get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols)
+      get_block_col(game_state.board, elem(last_play, 0), game_state.avail_cols)
     else
       nil
     end
   end
-  defp get_block_cols(_, _, []), do: nil
-  defp get_block_cols(board, player, [head | tail]) do
+  defp get_block_col(_, _, []), do: nil
+  defp get_block_col(board, player, [head | tail]) do
     if loc = find_open(board, head) do
       if check_win_or_draw(board, player, loc) == player do
         elem(loc, 0)
       else
-        get_block_cols(board, player, tail)
+        get_block_col(board, player, tail)
       end
     else
-      get_block_cols(board, player, tail)
+      get_block_col(board, player, tail)
     end
   end
 
