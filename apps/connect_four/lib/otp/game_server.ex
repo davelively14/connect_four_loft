@@ -112,6 +112,7 @@ defmodule ConnectFour.GameServer do
 
           cond do
             is_tuple(resp) ->
+              # If response is a tuple, it's an error. Returns error.
               {:reply, resp, state}
             true ->
               :ets.insert(state.ets, {opts[:game_id], new_game})
