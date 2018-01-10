@@ -7,7 +7,7 @@ defmodule ConnectFour.AI do
 
   def select_column(game_state, :easy) do
     if game_state.last_play do
-      if block = StatusCheck.get_block_cols(game_state) do
+      if block = StatusCheck.get_block_col(game_state) do
         block
       else
         Enum.random(game_state.avail_cols)
@@ -23,7 +23,7 @@ defmodule ConnectFour.AI do
         div(game_state.width + 1, 2)
       col = StatusCheck.get_win_col(game_state) ->
         col
-      col = StatusCheck.get_block_cols(game_state) ->
+      col = StatusCheck.get_block_col(game_state) ->
         col
       true ->
         best_col(game_state)
@@ -34,6 +34,8 @@ defmodule ConnectFour.AI do
   # Private Functions #
   #####################
 
+  # Scores each column via the StatusCheck.score method and returns the column
+  # with the highest score.
   defp best_col(game_state), do: best_col(game_state.avail_cols, game_state, nil)
   defp best_col([], _, {col, _}), do: col
   defp best_col([head | tail], game_state = %{board: board}, best) do

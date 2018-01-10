@@ -9,28 +9,28 @@ defmodule ConnectFour.StatusCheck do
 
   ## Examples
 
-      iex> get_block_cols(valid_game_state)
+      iex> get_block_col(valid_game_state)
       1
-      iex> get_block_cols(valid_game_state)
+      iex> get_block_col(valid_game_state)
       nil
   """
-  def get_block_cols(game_state) do
+  def get_block_col(game_state) do
     if last_play = game_state.last_play do
-      get_block_cols(game_state.board, elem(last_play, 0), game_state.avail_cols)
+      get_block_col(game_state.board, elem(last_play, 0), game_state.avail_cols)
     else
       nil
     end
   end
-  defp get_block_cols(_, _, []), do: nil
-  defp get_block_cols(board, player, [head | tail]) do
+  defp get_block_col(_, _, []), do: nil
+  defp get_block_col(board, player, [head | tail]) do
     if loc = find_open(board, head) do
       if check_win_or_draw(board, player, loc) == player do
         elem(loc, 0)
       else
-        get_block_cols(board, player, tail)
+        get_block_col(board, player, tail)
       end
     else
-      get_block_cols(board, player, tail)
+      get_block_col(board, player, tail)
     end
   end
 
@@ -138,13 +138,15 @@ defmodule ConnectFour.StatusCheck do
 
     cond do
       # Look ahead to prevent situations where an opponent has two ways to
-      # win laterally. Example, O would need to play either col 3 and 6.
+      # win laterally. Example, O would need to play either col 3 or 6 to
+      # prevent X from playing either of those next turn and guaranteeing X
+      # a win.
       # O - - X X - -
       head == 1 && check_sandwich(opp_board, game_state.board.free, loc) ->
         1000
 
       # Negatively scores situations where you might setup an opponent win
-      # Example, columns 2 and 6 would not be a viable play for player O:
+      # Example, columns 2 and 6 would not be a wise play for player O:
       # O - X X X - -
       # O - O X X - -
       rem(head, 2) == 0 && check_win_or_draw(game_state.board, opp, loc) ->
@@ -158,10 +160,10 @@ defmodule ConnectFour.StatusCheck do
         div(-1000, head)
 
       # Generic scoring methods. These numbers will generally be very low and
-      # only be relevant if none of the the earlier conditions fire for other
-      # cells in the column. The first function is for even distance from the
+      # only be relevant as a tiebreaker if none or more than one of the earlier
+      # conditions fire. The first function is for even distance from the
       # first free cell, the second function for odd. Generally speaking, odd
-      # favors the AI and even the opponent.
+      # favors the current player and even the opponent.
       rem(head, 2) == 0 ->
         this_score =
           (lateral_chain_length(player_board, loc) - lateral_chain_length(opp_board, loc) * 2) +
@@ -177,6 +179,7 @@ defmodule ConnectFour.StatusCheck do
 
         score(game_state, {x, y + 1}, tail, tallied_score + this_score)
       true ->
+        # This condition should never be met
         :error
     end
   end

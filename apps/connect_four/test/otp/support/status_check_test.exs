@@ -29,42 +29,42 @@ defmodule ConnectFour.StatusCheckTest do
     {:ok, %{game_state: game_state, board: board, player: player, loc: loc, avail_cols: avail_cols, game_id: game_id}}
   end
 
-  describe "get_block_cols/1" do
+  describe "get_block_col/1" do
     test "returns nil if new board or no threat to win", %{game_state: game_state} do
-      refute StatusCheck.get_block_cols(game_state)
+      refute StatusCheck.get_block_col(game_state)
     end
 
     @tag :setup_board_vert_block
     test "returns correct column required for blocking vertically", %{game_state: game_state} do
-      assert StatusCheck.get_block_cols(game_state) == 1
+      assert StatusCheck.get_block_col(game_state) == 1
     end
 
     @tag :setup_board_lat_block
     test "returns multiple columns for blocking when multiple ways to win", %{game_state: game_state} do
-      result = StatusCheck.get_block_cols(game_state)
+      result = StatusCheck.get_block_col(game_state)
 
       assert result == 2 || result == 6
     end
 
     @tag :setup_board_diag_back_block
     test "returns column for blocking a diagonal back", %{game_state: game_state} do
-      assert StatusCheck.get_block_cols(game_state) == 1
+      assert StatusCheck.get_block_col(game_state) == 1
     end
 
     @tag :setup_board_diag_fwd_block
     test "returns column for blocking a diagonal forward", %{game_state: game_state} do
-      assert StatusCheck.get_block_cols(game_state) == 4
+      assert StatusCheck.get_block_col(game_state) == 4
     end
 
     @tag :setup_board_full
     test "returns nil if board is full", %{game_state: game_state} do
-      refute StatusCheck.get_block_cols(game_state)
+      refute StatusCheck.get_block_col(game_state)
     end
   end
 
   describe "get_win_col/1" do
     test "returns nil if no move to win", %{game_state: game_state} do
-      refute StatusCheck.get_block_cols(game_state)
+      refute StatusCheck.get_block_col(game_state)
     end
 
     @tag :setup_board_vert_win
