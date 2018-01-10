@@ -1,5 +1,6 @@
 defmodule ConnectFour.GameServer do
   use GenServer
+  alias ConnectFour.StatusCheck
 
   @default_height 6
   @default_width 7
@@ -57,19 +58,19 @@ defmodule ConnectFour.GameServer do
   end
 
   def handle_call({:drop_piece, game_id, col}, _from, state) do
+    # Assigned result for game will either be a game_state or an error tuple
     game = fetch_game_from_ets(state.ets, game_id)
 
     cond do
       is_tuple(game) ->
+        # game will receive an error tuple if no game exists
         {:reply, game, state}
       game.finished == :draw ->
         {:reply, {:error, "The game ended in a draw."}, state}
       game.finished ->
         {:reply, {:error, "#{game.finished} already won the game."}, state}
       open_spot = find_open(game.board.free, game.height, col) ->
-        new_game_state =
-          make_move(open_spot, game)
-          |> Map.merge(%{current_player: advance_player(game.current_player)})
+        new_game_state = make_move(open_spot, game)
 
         :ets.insert(state.ets, {game_id, new_game_state})
 
@@ -79,6 +80,9 @@ defmodule ConnectFour.GameServer do
           {:reply, {:ok, new_game_state.finished}, state}
         end
       true ->
+        # If we make it this far, we have a column error. We first check if the
+        # error is due to the column being full, otherwise it's a column outside
+        # the dimensions of the board.
         unless col < 1 || col > game.width do
           {:reply, {:error, "Column #{col} is full. Choose another column."}, state}
         else
@@ -213,9 +217,10 @@ defmodule ConnectFour.GameServer do
       state,
       %{
         board: new_board,
-        finished: check_win_or_draw(state.current_player, new_free, new_player_board, loc),
+        finished: StatusCheck.check_win_or_draw(new_board, state.current_player, loc),
         avail_cols: new_avail_cols,
-        last_play: {state.current_player, loc}
+        last_play: {state.current_player, loc},
+        current_player: advance_player(state.current_player)
       }
     )
   end
@@ -240,97 +245,6 @@ defmodule ConnectFour.GameServer do
         false
       true ->
         true
-    end
-  end
-
-  ################
-  # Check Status #
-  ################
-
-  defp check_win_or_draw(player, free, player_board, loc) do
-    cond do
-      check_lateral(player_board, loc) -> player
-      check_vertical(player_board, loc) -> player
-      check_diag_back(player_board, loc) -> player
-      check_diag_fwd(player_board, loc) -> player
-      MapSet.size(free) == 0 -> :draw
-      true -> nil
-    end
-  end
-
-  def check_lateral(player_board, {x, y}) do
-    check_left(1, player_board, {x - 1, y}) |> check_right(player_board, {x + 1, y}) == 4
-  end
-
-  def check_vertical(player_board, {x, y}), do: check_vertical(1, player_board, {x, y - 1})
-  defp check_vertical(4, _, _), do: true
-  defp check_vertical(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_vertical(streak + 1, player_board, {x, y - 1})
-    else
-      false
-    end
-  end
-
-  def check_diag_back(player_board, {x, y}) do
-    check_up_left(1, player_board, {x - 1, y + 1}) |> check_down_right(player_board, {x + 1, y - 1}) == 4
-  end
-
-  def check_diag_fwd(player_board, {x, y}) do
-    check_up_right(1, player_board, {x + 1, y + 1}) |> check_down_left(player_board, {x - 1, y - 1}) == 4
-  end
-
-  defp check_left(4, _, _), do: 4
-  defp check_left(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_left(streak + 1, player_board, {x - 1, y})
-    else
-      streak
-    end
-  end
-
-  defp check_right(4, _, _), do: 4
-  defp check_right(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_right(streak + 1, player_board, {x + 1, y})
-    else
-      streak
-    end
-  end
-
-  defp check_up_left(4, _, _), do: 4
-  defp check_up_left(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_up_left(streak + 1, player_board, {x - 1, y + 1})
-    else
-      streak
-    end
-  end
-
-  defp check_down_right(4, _, _), do: 4
-  defp check_down_right(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_down_right(streak + 1, player_board, {x + 1, y - 1})
-    else
-      streak
-    end
-  end
-
-  defp check_up_right(4, _, _), do: 4
-  defp check_up_right(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_up_right(streak + 1, player_board, {x + 1, y + 1})
-    else
-      streak
-    end
-  end
-
-  defp check_down_left(4, _, _), do: 4
-  defp check_down_left(streak, player_board, loc = {x, y}) do
-    if MapSet.member?(player_board, loc) do
-      check_down_left(streak + 1, player_board, {x - 1, y - 1})
-    else
-      streak
     end
   end
 
