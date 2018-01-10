@@ -17,8 +17,8 @@ Once started, the API will be available to the node via the `ConnectFour.GameSer
 ### Table of Contents
 
 * [new_game](#new-game)
-* [get_state](#get-state)
 * [get_game](#get-game)
+* [get_state](#get-state)
 
 ### <a name="new-game"></a>new_game
 
@@ -50,26 +50,6 @@ iex> GameState.new_game(%{height: 3, width: 6, difficulty: :easy})
 {:ok, 2}
 iex> GameState.new_game()
 {:ok, 3}
-```
-
-### <a name="get-state"></a>get_state
-
-Returns the state of the GameServer. Note that this only includes settings for the GameServer itself. To retrieve the state of a particular game, go to the [get_game](#get-game) function.
-
-Call:
-```elixir
-GameState.get_state()
-```
-
-Returns a map with two keys:
-- `next_id`: The next unique id that will be used when a new game is started.
-- `ets`: The name of the ets table.
-
-#### Example:
-
-```
-iex> GameState.get_state()
-%{next_id: 13, ets: :games}
 ```
 
 ### <a name="get-game"></a>get_game
@@ -111,6 +91,25 @@ iex> GameState.get_game(1)
   difficulty: nil, finished: nil, height: 6, last_play: nil, width: 7}
 ```
 
+### <a name="get-state"></a>get_state
+
+Returns the state of the GameServer. Note that this only includes settings for the GameServer itself. To retrieve the state of a particular game, go to the [get_game](#get-game) function.
+
+Call:
+```elixir
+GameState.get_state()
+```
+
+Returns a map with two keys:
+- `next_id`: The next unique id that will be used when a new game is started.
+- `ets`: The name of the ets table.
+
+#### Example:
+
+```
+iex> GameState.get_state()
+%{next_id: 13, ets: :games}
+```
 
 
 - `GameServer.drop_piece/2`: Drops a piece for a given game on the given column.
