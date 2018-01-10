@@ -20,6 +20,7 @@ Once started, the API will be available to the node via the `ConnectFour.GameSer
 * [get_game](#get-game)
 * [get_state](#get-state)
 * [drop_piece](#drop-piece)
+* [reset_game](#reset-game)
 
 ### <a name="new-game"></a>new_game
 
@@ -127,7 +128,7 @@ Name | Required | Type | Notes
 
 Call:
 ```elixir
-GameState.drop_piece(425, 4)
+GameState.drop_piece(game_id, col)
 ```
 
 Returns one of:
@@ -143,10 +144,32 @@ iex> GameState.drop_piece(124, 4)
 {:error, "Game does not exist"}
 ```
 
-- `GameServer.reset_game/1`: Resets the game to it's original configuration
-  - Call: `GameServer.reset_game(game_id)`
-    - `game_id`: integer (required), the id for the game
-  - Returns: `:ok` or `{:error, reason}`
+### <a name="reset-game"></a>reset_game
+
+With a valid game_id, resets the game to it's original configuration.
+
+Name | Required | Type | Notes
+--- | :---: | :---: | ---
+*game_id* | yes | integer | The id of the game to be reset.
+
+Call:
+```elixir
+GameState.reset_game(game_id)
+```
+
+Returns one of:
+- `:ok`: Indicates the game has been reset successfully.
+- `{:error, reason}`: If error, will return a tuple with `:error` and a string representing the reason for the error.
+
+#### Example:
+
+```
+iex> GameState.reset_game(1)
+:ok
+iex> GameState.reset_game(124)
+{:error, "Game does not exist"}
+```
+
 - `GameServer.current_player/1`: Returns the current player.
   - Call: `GameServer.current_player(game_id)`
     - `game_id`: integer (required), the id for the game
