@@ -57,19 +57,19 @@ defmodule ConnectFour.GameServer do
   end
 
   def handle_call({:drop_piece, game_id, col}, _from, state) do
+    # Assigned result for game will either be a game_state or an error tuple
     game = fetch_game_from_ets(state.ets, game_id)
 
     cond do
       is_tuple(game) ->
+        # game will receive an error tuple if no game exists
         {:reply, game, state}
       game.finished == :draw ->
         {:reply, {:error, "The game ended in a draw."}, state}
       game.finished ->
         {:reply, {:error, "#{game.finished} already won the game."}, state}
       open_spot = find_open(game.board.free, game.height, col) ->
-        new_game_state =
-          make_move(open_spot, game)
-          |> Map.merge(%{current_player: advance_player(game.current_player)})
+        new_game_state = make_move(open_spot, game)
 
         :ets.insert(state.ets, {game_id, new_game_state})
 
@@ -79,6 +79,9 @@ defmodule ConnectFour.GameServer do
           {:reply, {:ok, new_game_state.finished}, state}
         end
       true ->
+        # If we make it this far, we have a column error. We first check if the
+        # error is due to the column being full, otherwise it's a column outside
+        # the dimensions of the board.
         unless col < 1 || col > game.width do
           {:reply, {:error, "Column #{col} is full. Choose another column."}, state}
         else
@@ -215,7 +218,8 @@ defmodule ConnectFour.GameServer do
         board: new_board,
         finished: check_win_or_draw(state.current_player, new_free, new_player_board, loc),
         avail_cols: new_avail_cols,
-        last_play: {state.current_player, loc}
+        last_play: {state.current_player, loc},
+        current_player: advance_player(state.current_player)
       }
     )
   end
