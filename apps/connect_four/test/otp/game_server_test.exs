@@ -219,54 +219,6 @@ defmodule ConnectFour.GameServerTest do
     end
   end
 
-  describe "check_lateral/2" do
-    test "returns true if win laterally" do
-      loc = {3,1}
-      assert GameServer.check_lateral(win_lateral_board(loc), loc)
-    end
-
-    test "returns false if no win laterally" do
-      loc = {3,1}
-      refute GameServer.check_lateral(no_win_lateral_board(loc), loc)
-    end
-  end
-
-  describe "check_vertical/2" do
-    test "returns true if win vertically" do
-      loc = {1,4}
-      assert GameServer.check_vertical(win_vertical_board(loc), loc)
-    end
-
-    test "returns false if no win vertically" do
-      loc = {1,3}
-      refute GameServer.check_vertical(no_win_vertical_board(loc), loc)
-    end
-  end
-
-  describe "check_diag_back/2" do
-    test "returns true if win backslash diagonally" do
-      loc = {3,3}
-      assert GameServer.check_diag_back(win_diag_back_board(loc), loc)
-    end
-
-    test "returns false if no win backslash diagonally" do
-      loc = {3,3}
-      refute GameServer.check_diag_back(no_win_diag_back_board(loc), loc)
-    end
-  end
-
-  describe "check_diag_fwd/2" do
-    test "returns true if win forwardslash diagonally" do
-      loc = {3,3}
-      assert GameServer.check_diag_fwd(win_diag_fwd_board(loc), loc)
-    end
-
-    test "returns false if no win forwardslash diagonally" do
-      loc = {3,3}
-      refute GameServer.check_diag_fwd(no_win_diag_fwd_board(loc), loc)
-    end
-  end
-
   describe "reset_game/1" do
     @describetag :start_new_game
 
@@ -408,64 +360,5 @@ defmodule ConnectFour.GameServerTest do
         GameServer.drop_piece(game_id, x + outer * 3)
       end
     end
-  end
-
-  defp win_lateral_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x + 1, y})
-    |> MapSet.put({x + 2, y})
-    |> MapSet.put({x - 1, y})
-  end
-
-  defp no_win_lateral_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x + 1, y})
-    |> MapSet.put({x + 2, y})
-  end
-
-  defp win_vertical_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x, y - 1})
-    |> MapSet.put({x, y - 2})
-    |> MapSet.put({x, y - 3})
-  end
-
-  defp no_win_vertical_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x, y - 1})
-  end
-
-  defp win_diag_back_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x - 1, y + 1})
-    |> MapSet.put({x - 2, y + 2})
-    |> MapSet.put({x + 1, y - 1})
-  end
-
-  defp no_win_diag_back_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x - 1, y + 1})
-    |> MapSet.put({x + 1, y - 1})
-  end
-
-  defp win_diag_fwd_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x + 1, y + 1})
-    |> MapSet.put({x + 2, y + 2})
-    |> MapSet.put({x - 1, y - 1})
-  end
-
-  defp no_win_diag_fwd_board({x, y}) do
-    MapSet.new()
-    |> MapSet.put({x, y})
-    |> MapSet.put({x + 1, y + 1})
-    |> MapSet.put({x - 1, y - 1})
   end
 end
