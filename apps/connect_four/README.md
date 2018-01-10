@@ -21,6 +21,7 @@ Once started, the API will be available to the node via the `ConnectFour.GameSer
 * [get_state](#get-state)
 * [drop_piece](#drop-piece)
 * [reset_game](#reset-game)
+* [current_player](#current-player)
 
 ### <a name="new-game"></a>new_game
 
@@ -170,7 +171,28 @@ iex> GameState.reset_game(124)
 {:error, "Game does not exist"}
 ```
 
-- `GameServer.current_player/1`: Returns the current player.
-  - Call: `GameServer.current_player(game_id)`
-    - `game_id`: integer (required), the id for the game
-  - Returns: current player (atom) or `{:error, reason}`
+### <a name="current-player"></a>current_player
+
+With a valid game id, returns the current player.
+
+Name | Required | Type | Notes
+--- | :---: | :---: | ---
+*game_id* | yes | integer | The id of the game being played.
+
+Call:
+```elixir
+GameState.current_player(game_id)
+```
+
+Returns one of:
+- `player`: An atom representing the current player. Either `:player_1` or `:player_2`.
+- `{:error, reason}`: If error, will return a tuple with `:error` and a string representing the reason for the error.
+
+#### Example:
+
+```
+iex> GameState.current_player(1)
+:player_1
+iex> GameState.current_player(124)
+{:error, "Game does not exist"}
+```
